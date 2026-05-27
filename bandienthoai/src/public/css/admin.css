@@ -945,11 +945,18 @@ body {
   gap: 22px;
 }
 
-.admin-order-grid {
+.admin-order-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 22px;
   align-items: start;
+}
+
+.admin-order-main-column,
+.admin-order-side-column {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
 }
 
 .admin-order-card {
@@ -1037,6 +1044,29 @@ body {
 
 .admin-order-items-card {
   min-width: 0;
+  align-self: start;
+}
+
+.admin-order-items-card .admin-table-wrap {
+  width: 100%;
+}
+
+.admin-order-items-card .admin-table {
+  min-width: 680px;
+}
+
+.admin-order-items-card .admin-table th,
+.admin-order-items-card .admin-table td {
+  vertical-align: middle;
+}
+
+.admin-order-items-card .admin-product-cell {
+  min-width: 0;
+  align-items: center;
+}
+
+.admin-order-items-card .admin-product-cell > div {
+  min-width: 0;
 }
 
 .admin-order-note {
@@ -1081,7 +1111,7 @@ body {
     position: static;
   }
 
-  .admin-order-grid {
+  .admin-order-layout {
     grid-template-columns: 1fr;
   }
 }

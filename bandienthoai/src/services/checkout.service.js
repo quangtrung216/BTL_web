@@ -4,7 +4,7 @@ const promotionService = require('./promotion.service');
 
 async function prepareCheckout(userId, options = {}) {
   if (options.tableOrder && !userId) {
-    return cartService.calculateGuestCartSummary(options.guestCart, options.promotionCode);
+    return cartService.calculateGuestCartSummary(options.guestCart);
   }
   return cartService.calculateCartSummary(userId, options.promotionCode);
 }
@@ -48,7 +48,7 @@ async function createOrderFromCart(userId, checkoutData, options = {}) {
     let promotionId = null;
     let discountAmount = 0;
 
-    if (checkoutData.promotion_code) {
+    if (!tableOrder && checkoutData.promotion_code) {
       const promotionResult = await promotionService.validatePromotionCode(checkoutData.promotion_code, subtotal);
       if (!promotionResult.ok) {
         await connection.rollback();

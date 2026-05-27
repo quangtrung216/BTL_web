@@ -4,7 +4,12 @@ const promotionService = require('../../services/promotion.service');
 module.exports = {
   async index(req, res, next) {
     try {
-      const promotionCode = req.session.cartPromotionCode || '';
+      if (req.session.tableOrder) {
+        delete req.session.cartPromotionCode;
+        delete req.session.cartPromotionMessage;
+        delete req.session.cartPromotionError;
+      }
+      const promotionCode = req.session.tableOrder ? '' : (req.session.cartPromotionCode || '');
       const summary = req.session.user
         ? await cartService.calculateCartSummary(req.session.user.id, promotionCode)
         : await cartService.calculateGuestCartSummary(req.session.guestCart, promotionCode);
@@ -75,6 +80,13 @@ module.exports = {
 
   async applyPromotion(req, res, next) {
     try {
+      if (req.session.tableOrder) {
+        delete req.session.cartPromotionCode;
+        delete req.session.cartPromotionMessage;
+        req.session.cartPromotionError = 'Đơn tại bàn không áp dụng mã giảm giá.';
+        return res.redirect('/cart');
+      }
+
       const code = String(req.body.promotion_code || '').trim();
       const summary = req.session.user
         ? await cartService.calculateCartSummary(req.session.user.id)

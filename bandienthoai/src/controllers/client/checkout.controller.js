@@ -7,7 +7,7 @@ module.exports = {
       const summary = await checkoutService.prepareCheckout(req.session.user?.id || null, {
         tableOrder: req.session.tableOrder,
         guestCart: req.session.guestCart,
-        promotionCode: req.session.cartPromotionCode
+        promotionCode: req.session.tableOrder ? '' : req.session.cartPromotionCode
       });
       return res.render('client/checkout/index', { title: 'Thanh toán', summary });
     } catch (error) { return next(error); }
@@ -27,7 +27,7 @@ module.exports = {
           summary: await checkoutService.prepareCheckout(userId, {
             tableOrder: req.session.tableOrder,
             guestCart: req.session.guestCart,
-            promotionCode: req.session.cartPromotionCode
+            promotionCode: req.session.tableOrder ? '' : req.session.cartPromotionCode
           })
         });
       }

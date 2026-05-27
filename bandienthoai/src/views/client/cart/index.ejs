@@ -2,16 +2,19 @@
   const rows = Array.isArray(items) ? items : [];
   const totalQuantity = summary ? Number(summary.totalQuantity || 0) : 0;
   const subtotal = summary ? Number(summary.totalAmount || 0) : 0;
-  const discount = summary ? Number(summary.discountAmount || 0) : 0;
+  const activeTableOrder = typeof tableOrder !== 'undefined' && tableOrder ? tableOrder : null;
+  const allowPromotion = !activeTableOrder;
+  const discount = allowPromotion && summary ? Number(summary.discountAmount || 0) : 0;
   const deliveryFee = 0;
-  const totalPayment = summary ? Number(summary.finalAmount || Math.max(0, subtotal - discount + deliveryFee)) : 0;
+  const totalPayment = activeTableOrder
+    ? Math.max(0, subtotal + deliveryFee)
+    : (summary ? Number(summary.finalAmount || Math.max(0, subtotal - discount + deliveryFee)) : 0);
   const rewardPoints = Math.max(1, Math.round(totalPayment / 10000));
   const user = typeof currentUser !== 'undefined' && currentUser ? currentUser : {};
-  const activeTableOrder = typeof tableOrder !== 'undefined' && tableOrder ? tableOrder : null;
-  const appliedPromotion = summary && summary.promotion ? summary.promotion : null;
-  const promotionCode = summary ? String(summary.promotionCode || '') : '';
-  const promotionMessage = summary ? summary.promotionMessage : null;
-  const promotionError = summary ? summary.promotionError : null;
+  const appliedPromotion = allowPromotion && summary && summary.promotion ? summary.promotion : null;
+  const promotionCode = allowPromotion && summary ? String(summary.promotionCode || '') : '';
+  const promotionMessage = allowPromotion && summary ? summary.promotionMessage : null;
+  const promotionError = allowPromotion && summary ? summary.promotionError : null;
   const userAddress = String(user.address || '');
   const formatMoney = function(value) {
     return Number(value || 0).toLocaleString('vi-VN') + '&#273;';
@@ -102,37 +105,41 @@
       <h2>Tóm tắt đơn hàng</h2>
       <div class='cart-summary-lines'>
         <div><span>Tạm tính (<%= totalQuantity %> món)</span><strong><%- formatMoney(subtotal) %></strong></div>
-        <div><span>Giảm giá</span><strong class='is-green'><%- discount ? '-' + formatMoney(discount) : formatMoney(0) %></strong></div>
+        <% if (allowPromotion) { %>
+          <div><span>Giảm giá</span><strong class='is-green'><%- discount ? '-' + formatMoney(discount) : formatMoney(0) %></strong></div>
+        <% } %>
         <div><span>Phí giao hàng</span><strong><%- deliveryFee ? formatMoney(deliveryFee) : 'Miễn phí' %></strong></div>
       </div>
       <div class='cart-total-row'>
         <span>Tổng thanh toán</span>
         <strong><%- formatMoney(totalPayment) %></strong>
       </div>
-      <div class='cart-discount'>
-        <label for='cartDiscountCode'>Mã giảm giá</label>
-        <form method='post' action='/cart/promotion/apply'>
-          <input id='cartDiscountCode' name='promotion_code' type='text' value='<%= promotionCode %>' placeholder='Nhập mã'>
-          <button type='submit'>Áp dụng</button>
-        </form>
-        <% if (promotionMessage) { %>
-          <p class='cart-discount__message is-success'><%= promotionMessage %></p>
-        <% } %>
-        <% if (promotionError) { %>
-          <p class='cart-discount__message is-error'><%= promotionError %></p>
-        <% } %>
-        <% if (appliedPromotion) { %>
-          <form class='cart-discount__remove' method='post' action='/cart/promotion/remove'>
-            <button type='submit'>Bỏ mã <%= appliedPromotion.code %></button>
+      <% if (allowPromotion) { %>
+        <div class='cart-discount'>
+          <label for='cartDiscountCode'>Mã giảm giá</label>
+          <form method='post' action='/cart/promotion/apply'>
+            <input id='cartDiscountCode' name='promotion_code' type='text' value='<%= promotionCode %>' placeholder='Nhập mã'>
+            <button type='submit'>Áp dụng</button>
           </form>
-        <% } %>
-      </div>
+          <% if (promotionMessage) { %>
+            <p class='cart-discount__message is-success'><%= promotionMessage %></p>
+          <% } %>
+          <% if (promotionError) { %>
+            <p class='cart-discount__message is-error'><%= promotionError %></p>
+          <% } %>
+          <% if (appliedPromotion) { %>
+            <form class='cart-discount__remove' method='post' action='/cart/promotion/remove'>
+              <button type='submit'>Bỏ mã <%= appliedPromotion.code %></button>
+            </form>
+          <% } %>
+        </div>
+      <% } %>
       <p class='cart-points'>&#9881; Bạn sẽ nhận <%= rewardPoints %> điểm Brew Points cho đơn hàng này!</p>
     </aside>
   </div>
 
   <form class='cart-order-form' method='post' action='/checkout'>
-    <% if (appliedPromotion) { %>
+    <% if (allowPromotion && appliedPromotion) { %>
       <input type='hidden' name='promotion_code' value='<%= appliedPromotion.code %>'>
     <% } %>
     <% if (activeTableOrder) { %>
