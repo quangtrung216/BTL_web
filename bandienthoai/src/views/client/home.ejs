@@ -7,7 +7,7 @@
     { name: 'Cakes', image: '/images/products/banh-tiramisu.jpg' }
   ];
 
-  const displayProducts = featuredProducts && featuredProducts.length > 0 ? featuredProducts.slice(0, 4) : [];
+  const displayProducts = featuredProducts && featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : [];
 %>
 
 <div class='brew-home'>
@@ -57,7 +57,7 @@
       <a href='/products'>View All <span aria-hidden='true'>-&gt;</span></a>
     </div>
     <div class='home-best'>
-      <div class='home-products'>
+      <div class='home-products home-products--carousel' data-home-carousel>
         <% if (displayProducts.length) { %>
           <% displayProducts.forEach(function(p) { %>
             <article class='home-product'>

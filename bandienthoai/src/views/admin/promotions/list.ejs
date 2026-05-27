@@ -1,28 +1,117 @@
-<div class='container'>
-  <h1>Khuyến mãi</h1>
-  <% const rows = Array.isArray(items) ? items : []; %>
+<% const rows = Array.isArray(items) ? items : []; %>
+<%
+  const money = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0
+  });
+  const now = new Date();
+  const formatDate = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+  };
+  const formatDiscount = function(row) {
+    const value = Number(row.discount_value || 0);
+    return row.discount_type === 'fixed'
+      ? money.format(value)
+      : value.toLocaleString('vi-VN') + '%';
+  };
+  const getStatus = function(row) {
+    if (Number(row.is_active) !== 1) return { label: 'Tạm tắt', className: 'is-muted' };
+    if (row.start_date && new Date(row.start_date) > now) return { label: 'Sắp diễn ra', className: 'is-info' };
+    if (row.end_date && new Date(row.end_date) < now) return { label: 'Hết hạn', className: 'is-danger' };
+    return { label: 'Đang chạy', className: '' };
+  };
+  const activeCount = rows.filter(function(row) { return getStatus(row).label === 'Đang chạy'; }).length;
+  const pausedCount = rows.filter(function(row) { return Number(row.is_active) !== 1; }).length;
+  const expiringCount = rows.filter(function(row) {
+    if (!row.end_date || Number(row.is_active) !== 1) return false;
+    const diffDays = (new Date(row.end_date) - now) / (1000 * 60 * 60 * 24);
+    return diffDays >= 0 && diffDays <= 7;
+  }).length;
+%>
+
+<section class='admin-promotions-page'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Quản lý khuyến mãi</h1>
+      <p>Theo dõi mã giảm giá, thời gian hiệu lực, điều kiện đơn hàng và lượt sử dụng còn lại.</p>
+    </div>
+    <a class='admin-link-button' href='/admin/promotions/create'>Tạo khuyến mãi</a>
+  </div>
+
+  <div class='promotion-summary-grid'>
+    <article class='promotion-stat-card'>
+      <small>Tổng mã</small>
+      <strong><%= rows.length.toLocaleString('vi-VN') %></strong>
+      <span>Tất cả chương trình</span>
+    </article>
+    <article class='promotion-stat-card'>
+      <small>Đang chạy</small>
+      <strong><%= activeCount.toLocaleString('vi-VN') %></strong>
+      <span>Có thể áp dụng</span>
+    </article>
+    <article class='promotion-stat-card'>
+      <small>Sắp hết hạn</small>
+      <strong><%= expiringCount.toLocaleString('vi-VN') %></strong>
+      <span>Trong 7 ngày tới</span>
+    </article>
+    <article class='promotion-stat-card'>
+      <small>Tạm tắt</small>
+      <strong><%= pausedCount.toLocaleString('vi-VN') %></strong>
+      <span>Không hiển thị cho khách</span>
+    </article>
+  </div>
+
   <% if (!rows.length) { %>
-    <p>Chưa có dữ liệu.</p>
+    <section class='promotion-empty-state'>
+      <h2>Chưa có khuyến mãi</h2>
+      <p>Tạo mã giảm giá đầu tiên để khách hàng có thể áp dụng khi thanh toán.</p>
+      <a class='admin-link-button' href='/admin/promotions/create'>Tạo khuyến mãi</a>
+    </section>
   <% } else { %>
-    <table border='1' cellpadding='8' cellspacing='0'>
-      <thead>
-        <tr>
-          <% Object.keys(rows[0]).forEach(function(key) { %>
-            <th><%= key %></th>
-          <% }) %>
-          <th>Chi tiết</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% rows.forEach(function(row) { %>
+    <div class='admin-table-wrap promotion-table-wrap'>
+      <table class='admin-table promotion-table'>
+        <thead>
           <tr>
-            <% Object.keys(rows[0]).forEach(function(key) { %>
-              <td><%= row[key] %></td>
-            <% }) %>
-            <td><a href='/admin/promotions/edit/<%= row.id %>'>Xem</a></td>
+            <th>Mã</th>
+            <th>Chương trình</th>
+            <th>Ưu đãi</th>
+            <th>Đơn tối thiểu</th>
+            <th>Thời gian</th>
+            <th>Lượt dùng</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% rows.forEach(function(row) { %>
+            <% const status = getStatus(row); %>
+            <tr>
+              <td><span class='promotion-code'><%= row.code %></span></td>
+              <td>
+                <strong><%= row.name %></strong>
+                <small class='admin-muted-text'>#<%= row.id %> cập nhật <%= formatDate(row.updated_at) %></small>
+              </td>
+              <td><strong class='promotion-offer'><%= formatDiscount(row) %></strong></td>
+              <td><%= money.format(Number(row.min_order_value || 0)) %></td>
+              <td>
+                <span><%= formatDate(row.start_date) %></span>
+                <small class='admin-muted-text'>đến <%= formatDate(row.end_date) %></small>
+              </td>
+              <td><%= row.usage_limit === null || row.usage_limit === undefined ? 'Không giới hạn' : Number(row.usage_limit || 0).toLocaleString('vi-VN') %></td>
+              <td><span class='status-pill <%= status.className %>'><%= status.label %></span></td>
+              <td>
+                <div class='admin-action-row'>
+                  <a class='admin-table-link' href='/admin/promotions/edit/<%= row.id %>'>Sửa</a>
+                  <form class='admin-inline-form' method='post' action='/admin/promotions/delete/<%= row.id %>' onsubmit="return confirm('Bạn muốn xóa khuyến mãi này?')">
+                    <button class='admin-danger-button' type='submit'>Xóa</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
   <% } %>
-</div>
+</section>

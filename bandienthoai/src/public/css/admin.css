@@ -53,6 +53,14 @@ body {
   background: #7b431f;
   border-radius: 50%;
   font-weight: 800;
+  overflow: hidden;
+}
+
+.admin-brand__mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .admin-brand strong,
@@ -84,6 +92,22 @@ body {
   text-decoration: none;
   font-weight: 700;
   font-size: 14px;
+}
+
+.admin-nav__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  font-weight: 800;
+}
+
+.admin-nav__icon img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
 .admin-nav a:hover,
@@ -175,6 +199,14 @@ body {
 .admin-avatar {
   color: #fff;
   background: #7b431f;
+  overflow: hidden;
+}
+
+.admin-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .admin-content {
@@ -329,6 +361,28 @@ body {
   height: var(--h);
   background: #a57455;
   border-radius: 6px 6px 0 0;
+  transform-origin: bottom;
+  animation: chartBarRise 680ms cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.bar-chart span:hover {
+  background: #7f553d;
+  box-shadow: 0 12px 24px rgba(127, 85, 61, .24);
+  transform: translateY(-4px);
+}
+
+.bar-chart span::before {
+  content: attr(data-value);
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  transform: translateX(-50%);
+  color: #5f4638;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .bar-chart span::after {
@@ -341,12 +395,158 @@ body {
   font-size: 12px;
 }
 
+@keyframes chartBarRise {
+  from {
+    transform: scaleY(0);
+    opacity: .35;
+  }
+
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
 .top-products {
   display: grid;
   gap: 14px;
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.admin-promotions-page,
+.admin-promotion-editor {
+  display: grid;
+  gap: 22px;
+}
+
+.promotion-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.promotion-stat-card,
+.promotion-empty-state,
+.promotion-preview-card {
+  background: #fff;
+  border: 1px solid #eadfd4;
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(52, 37, 25, .06);
+}
+
+.promotion-stat-card {
+  padding: 20px;
+}
+
+.promotion-stat-card small,
+.promotion-stat-card span {
+  display: block;
+  color: #83776e;
+}
+
+.promotion-stat-card strong {
+  display: block;
+  margin: 8px 0 4px;
+  color: #241f1b;
+  font-size: 30px;
+}
+
+.promotion-empty-state {
+  padding: 34px;
+}
+
+.promotion-empty-state h2,
+.promotion-empty-state p {
+  margin-top: 0;
+}
+
+.promotion-empty-state p {
+  color: #776b62;
+}
+
+.promotion-table td {
+  vertical-align: middle;
+}
+
+.promotion-code {
+  display: inline-grid;
+  place-items: center;
+  min-width: 96px;
+  padding: 8px 10px;
+  color: #6f3d1f;
+  background: #fff4dc;
+  border: 1px dashed #c69450;
+  border-radius: 6px;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.promotion-offer {
+  color: #2f6a43;
+}
+
+.admin-muted-text {
+  display: block;
+  margin-top: 4px;
+  color: #83776e;
+  font-size: 12px;
+}
+
+.promotion-form {
+  align-items: start;
+}
+
+.promotion-preview-card {
+  position: sticky;
+  top: 24px;
+  padding: 24px;
+}
+
+.promotion-preview-card > span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 88px;
+  padding: 10px 14px;
+  color: #fff;
+  background: #7b431f;
+  border-radius: 6px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+.promotion-preview-card h2 {
+  margin: 18px 0 8px;
+  color: #2c231d;
+}
+
+.promotion-preview-card p {
+  margin: 0 0 20px;
+  color: #75695f;
+  line-height: 1.6;
+}
+
+.promotion-preview-card dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.promotion-preview-card dl div {
+  padding-top: 12px;
+  border-top: 1px solid #f0e7df;
+}
+
+.promotion-preview-card dt {
+  color: #8a7a6d;
+  font-size: 12px;
+}
+
+.promotion-preview-card dd {
+  margin: 4px 0 0;
+  color: #2b241f;
+  font-weight: 800;
 }
 
 .top-products li {
@@ -1107,8 +1307,13 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .admin-product-preview {
+  .admin-product-preview,
+  .promotion-preview-card {
     position: static;
+  }
+
+  .promotion-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-order-layout {
@@ -1130,7 +1335,8 @@ body {
 
   .admin-nav,
   .metric-grid,
-  .dashboard-grid {
+  .dashboard-grid,
+  .promotion-summary-grid {
     grid-template-columns: 1fr;
   }
 

@@ -3,7 +3,12 @@ const promotionModel = require('../models/promotion.model');
 const { allRows, rowById, insertRow, updateRow, deleteRow, searchRows } = require('./_base.service');
 
 async function getAllPromotions(...args) {
-  return allRows(promotionModel);
+  const [rows] = await db.execute('SELECT * FROM promotions ORDER BY id DESC');
+  return rows;
+}
+
+async function list(...args) {
+  return getAllPromotions(...args);
 }
 
 
@@ -96,12 +101,35 @@ async function validatePromotionCode(...args) {
 
 
 async function createPromotion(...args) {
-  return insertRow(promotionModel, args[0] || {});
+  return insertRow(promotionModel, normalizePromotionPayload(args[0] || {}));
 }
 
 
 async function updatePromotion(...args) {
-  return updateRow(promotionModel, args[0], args[1] || {});
+  return updateRow(promotionModel, args[0], normalizePromotionPayload(args[1] || {}));
+}
+
+function normalizeDateTime(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return raw;
+  if (raw.includes('T')) return `${raw.replace('T', ' ')}:00`;
+  return raw;
+}
+
+function normalizePromotionPayload(data) {
+  return {
+    code: normalizePromotionCode(data.code),
+    name: String(data.name || '').trim(),
+    discount_type: ['fixed', 'percent'].includes(String(data.discount_type || '').toLowerCase())
+      ? String(data.discount_type).toLowerCase()
+      : 'percent',
+    discount_value: Number(data.discount_value || 0),
+    min_order_value: Number(data.min_order_value || 0),
+    start_date: normalizeDateTime(data.start_date),
+    end_date: normalizeDateTime(data.end_date),
+    usage_limit: data.usage_limit === '' || data.usage_limit === undefined ? null : Number(data.usage_limit || 0),
+    is_active: Number(data.is_active || 0) === 1 ? 1 : 0
+  };
 }
 
 
@@ -128,6 +156,7 @@ async function getPromotionProducts(...args) {
 
 module.exports = {
   getAllPromotions,
+  list,
   getActivePromotions,
   getPromotionById,
   getPromotionByCode,

@@ -114,4 +114,48 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize cart count on page load
   updateCartCount();
+
+  const homeCarousel = document.querySelector('[data-home-carousel]');
+  if (homeCarousel && homeCarousel.children.length > 1) {
+    let carouselTimer = null;
+    let isPaused = false;
+
+    const rotateBestSeller = function() {
+      if (isPaused || homeCarousel.classList.contains('is-sliding')) return;
+
+      const firstCard = homeCarousel.firstElementChild;
+      if (!firstCard) return;
+
+      homeCarousel.classList.add('is-sliding');
+
+      window.setTimeout(function() {
+        homeCarousel.appendChild(firstCard);
+        homeCarousel.classList.remove('is-sliding');
+      }, 720);
+    };
+
+    carouselTimer = window.setInterval(rotateBestSeller, 10000);
+
+    homeCarousel.addEventListener('mouseenter', function() {
+      isPaused = true;
+    });
+    homeCarousel.addEventListener('mouseleave', function() {
+      isPaused = false;
+    });
+    homeCarousel.addEventListener('focusin', function() {
+      isPaused = true;
+    });
+    homeCarousel.addEventListener('focusout', function() {
+      isPaused = false;
+    });
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && carouselTimer) {
+        window.clearInterval(carouselTimer);
+        carouselTimer = null;
+      } else if (!document.hidden && !carouselTimer) {
+        carouselTimer = window.setInterval(rotateBestSeller, 10000);
+      }
+    });
+  }
 });

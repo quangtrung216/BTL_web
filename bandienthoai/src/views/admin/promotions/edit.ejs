@@ -1,14 +1,132 @@
-<div class='container'>
-  <h1>Sửa khuyến mãi</h1>
-  <form method='post' action=''>
-    <p>Biểu mẫu cơ bản. Bạn có thể chỉnh lại trường cho đúng nghiệp vụ.</p>
-    <div><input type='text' name='name' value='<%= item && item.name ? item.name : " %>' placeholder='name'></div>
-    <div><input type='text' name='title' value='<%= item && item.title ? item.title : " %>' placeholder='title'></div>
-    <div><input type='text' name='full_name' value='<%= item && item.full_name ? item.full_name : " %>' placeholder='full_name'></div>
-    <div><input type='email' name='email' value='<%= item && item.email ? item.email : " %>' placeholder='email'></div>
-    <div><input type='number' name='price' value='<%= item && item.price ? item.price : " %>' placeholder='price'></div>
-    <div><input type='number' name='stock' value='<%= item && item.stock ? item.stock : " %>' placeholder='stock'></div>
-    <div><textarea name='description' placeholder='description'><%= item && item.description ? item.description : " %></textarea></div>
-    <button type='submit'>Lưu</button>
-  </form>
-</div>
+<% const promo = item || {}; %>
+<%
+  const money = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0
+  });
+  const toInputDate = function(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const pad = function(number) { return String(number).padStart(2, '0'); };
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+  const formatDiscount = function(row) {
+    const value = Number(row.discount_value || 0);
+    return row.discount_type === 'fixed'
+      ? money.format(value)
+      : value.toLocaleString('vi-VN') + '%';
+  };
+  const currentType = promo.discount_type || 'percent';
+  const currentActive = promo.is_active === undefined ? 1 : Number(promo.is_active);
+%>
+
+<section class='admin-promotion-editor'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Sửa khuyến mãi</h1>
+      <p>Cập nhật giá trị ưu đãi, điều kiện đơn hàng và trạng thái phát hành mã.</p>
+    </div>
+    <a class='admin-table-link' href='/admin/promotions'>Quay lại danh sách</a>
+  </div>
+
+  <% if (!promo.id) { %>
+    <section class='promotion-empty-state'>
+      <h2>Không tìm thấy khuyến mãi</h2>
+      <p>Mã khuyến mãi này không tồn tại hoặc đã bị xóa.</p>
+      <a class='admin-link-button' href='/admin/promotions'>Về danh sách</a>
+    </section>
+  <% } else { %>
+    <form class='admin-product-form promotion-form' method='post' action=''>
+      <aside class='promotion-preview-card'>
+        <span><%= promo.code || 'SALE' %></span>
+        <h2><%= promo.name || 'Khuyến mãi' %></h2>
+        <p>Ưu đãi hiện tại: <strong><%= formatDiscount(promo) %></strong></p>
+        <dl>
+          <div>
+            <dt>Đơn tối thiểu</dt>
+            <dd><%= money.format(Number(promo.min_order_value || 0)) %></dd>
+          </div>
+          <div>
+            <dt>Lượt dùng</dt>
+            <dd><%= promo.usage_limit === null || promo.usage_limit === undefined ? 'Không giới hạn' : Number(promo.usage_limit || 0).toLocaleString('vi-VN') %></dd>
+          </div>
+        </dl>
+      </aside>
+
+      <div class='admin-product-form-card'>
+        <div class='admin-form-section'>
+          <h2>Thông tin mã</h2>
+          <div class='admin-form-grid'>
+            <label>
+              <span>Mã khuyến mãi</span>
+              <input type='text' name='code' value='<%= promo.code || "" %>' placeholder='SUMMER15' required>
+            </label>
+
+            <label>
+              <span>Tên chương trình</span>
+              <input type='text' name='name' value='<%= promo.name || "" %>' placeholder='Ưu đãi mùa hè 15%' required>
+            </label>
+
+            <label>
+              <span>Trạng thái</span>
+              <select name='is_active'>
+                <option value='1' <%= currentActive === 1 ? 'selected' : '' %>>Đang bật</option>
+                <option value='0' <%= currentActive !== 1 ? 'selected' : '' %>>Tạm tắt</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class='admin-form-section'>
+          <h2>Giá trị ưu đãi</h2>
+          <div class='admin-form-grid'>
+            <label>
+              <span>Kiểu giảm</span>
+              <select name='discount_type'>
+                <option value='percent' <%= currentType === 'percent' ? 'selected' : '' %>>Theo phần trăm</option>
+                <option value='fixed' <%= currentType === 'fixed' ? 'selected' : '' %>>Số tiền cố định</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Giá trị giảm</span>
+              <input type='number' step='0.01' min='0' name='discount_value' value='<%= promo.discount_value || "" %>' placeholder='15' required>
+            </label>
+
+            <label>
+              <span>Đơn tối thiểu</span>
+              <input type='number' step='1000' min='0' name='min_order_value' value='<%= promo.min_order_value || 0 %>' placeholder='80000' required>
+            </label>
+
+            <label>
+              <span>Giới hạn lượt dùng</span>
+              <input type='number' min='0' name='usage_limit' value='<%= promo.usage_limit === null || promo.usage_limit === undefined ? "" : promo.usage_limit %>' placeholder='Để trống nếu không giới hạn'>
+            </label>
+          </div>
+        </div>
+
+        <div class='admin-form-section'>
+          <h2>Thời gian áp dụng</h2>
+          <div class='admin-form-grid'>
+            <label>
+              <span>Ngày bắt đầu</span>
+              <input type='datetime-local' name='start_date' value='<%= toInputDate(promo.start_date) %>' required>
+            </label>
+
+            <label>
+              <span>Ngày kết thúc</span>
+              <input type='datetime-local' name='end_date' value='<%= toInputDate(promo.end_date) %>' required>
+            </label>
+          </div>
+        </div>
+
+        <div class='admin-product-form-actions'>
+          <a class='admin-table-link' href='/admin/promotions'>Hủy</a>
+          <button type='submit'>Lưu thay đổi</button>
+        </div>
+      </div>
+    </form>
+  <% } %>
+</section>

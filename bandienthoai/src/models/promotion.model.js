@@ -5,28 +5,42 @@ const Promotion = {
   columns: [
     {
       name: 'id',
-      type: 'int(10) unsigned',
+      type: 'bigint unsigned',
       nullable: 'NO',
       key: 'PRI',
       extra: 'auto_increment'
     },
     {
-      name: 'title',
-      type: 'varchar(255)',
+      name: 'code',
+      type: 'varchar(50)',
+      nullable: 'NO',
+      key: 'UNI',
+      extra: ''
+    },
+    {
+      name: 'name',
+      type: 'varchar(100)',
       nullable: 'NO',
       key: '',
       extra: ''
     },
     {
-      name: 'description',
-      type: 'text',
-      nullable: 'YES',
+      name: 'discount_type',
+      type: "enum('percent','fixed')",
+      nullable: 'NO',
       key: '',
       extra: ''
     },
     {
-      name: 'discount_percent',
-      type: 'decimal(5,2) unsigned',
+      name: 'discount_value',
+      type: 'decimal(10,2)',
+      nullable: 'NO',
+      key: '',
+      extra: ''
+    },
+    {
+      name: 'min_order_value',
+      type: 'decimal(10,2)',
       nullable: 'NO',
       key: '',
       extra: ''
@@ -46,9 +60,16 @@ const Promotion = {
       extra: ''
     },
     {
-      name: 'status',
+      name: 'usage_limit',
+      type: 'int',
+      nullable: 'YES',
+      key: '',
+      extra: ''
+    },
+    {
+      name: 'is_active',
       type: 'tinyint(1)',
-      nullable: 'NO',
+      nullable: 'YES',
       key: '',
       extra: ''
     },
@@ -68,18 +89,21 @@ const Promotion = {
     },
   ],
   fillable: [
-  'title',
-  'description',
-  'discount_percent',
+  'code',
+  'name',
+  'discount_type',
+  'discount_value',
+  'min_order_value',
   'start_date',
   'end_date',
-  'status',
+  'usage_limit',
+  'is_active',
   'created_at',
   'updated_at'
   ],
   searchable: [
-  'title',
-  'description'
+  'code',
+  'name'
   ],
   foreignKeys: [
   ]

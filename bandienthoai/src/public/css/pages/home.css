@@ -366,6 +366,22 @@ body.home-page .page__content {
   gap: 15px;
 }
 
+.home-products--carousel {
+  display: flex;
+  grid-template-columns: none;
+  overflow: hidden;
+  gap: 15px;
+}
+
+.home-products--carousel .home-product {
+  flex: 0 0 calc((100% - 45px) / 4);
+}
+
+.home-products--carousel.is-sliding .home-product {
+  transform: translateX(calc(-100% - 15px));
+  transition: transform .7s ease;
+}
+
 .home-product {
   position: relative;
   min-width: 0;
@@ -918,6 +934,19 @@ body.home-page .footer-bottom p {
   .home-products {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .home-products--carousel {
+    display: flex;
+    gap: 8px;
+  }
+
+  .home-products--carousel .home-product {
+    flex: 0 0 100%;
+  }
+
+  .home-products--carousel.is-sliding .home-product {
+    transform: translateX(calc(-100% - 8px));
   }
 
   .home-product {

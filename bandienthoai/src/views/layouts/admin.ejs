@@ -10,7 +10,9 @@
   <div class='admin-shell'>
     <aside class='admin-sidebar'>
       <a class='admin-brand' href='/admin'>
-        <span class='admin-brand__mark'>BH</span>
+        <span class='admin-brand__mark'>
+          <img src='/images/logo/main_logo.png' alt='Brew Haven'>
+        </span>
         <span>
           <strong>Brew Haven</strong>
           <small>Coffee & More</small>
@@ -18,9 +20,9 @@
       </a>
 
       <% const navItems = [
-        { href: '/admin', label: 'Dashboard', icon: 'H' },
-        { href: '/admin/products', label: 'Sản phẩm', icon: 'P' },
-        { href: '/admin/categories', label: 'Danh mục', icon: 'C' },
+        { href: '/admin', label: 'Dashboard', icon: 'H', image: '/images/testimonials/icons8-dashboard-24.png' },
+        { href: '/admin/products', label: 'Sản phẩm', icon: 'P', image: '/images/testimonials/icons8-product.gif' },
+        { href: '/admin/categories', label: 'Danh mục', icon: 'C', image: '/images/testimonials/icons8-category-80.png' },
         { href: '/admin/orders', label: 'Đơn hàng', icon: 'O' },
         { href: '/admin/reservations', label: 'Đặt bàn', icon: 'B' },
         { href: '/admin/users', label: 'Khách hàng', icon: 'U' },
@@ -32,7 +34,13 @@
         <% navItems.forEach(function(item) { %>
           <% const active = currentPath === item.href || (item.href !== '/admin' && currentPath.startsWith(item.href)); %>
           <a class='<%= active ? "is-active" : "" %>' href='<%= item.href %>'>
-            <span aria-hidden='true'><%= item.icon %></span>
+            <span class='admin-nav__icon' aria-hidden='true'>
+              <% if (item.image) { %>
+                <img src='<%= item.image %>' alt=''>
+              <% } else { %>
+                <%= item.icon %>
+              <% } %>
+            </span>
             <%= item.label %>
           </a>
         <% }) %>
@@ -49,7 +57,9 @@
         <div class='admin-account'>
           <span class='admin-bell' aria-hidden='true'>!</span>
           <a class='admin-profile-link' href='/admin/profile' aria-label='Hồ sơ admin'>
-            <span class='admin-avatar'><%= (currentUser?.full_name || 'A').charAt(0).toUpperCase() %></span>
+            <span class='admin-avatar'>
+              <img src='/images/testimonials/icons8-admin-100.png' alt='Admin'>
+            </span>
             <span>
               <strong><%= currentUser?.full_name || 'Admin' %></strong>
               <small>Quản trị viên</small>

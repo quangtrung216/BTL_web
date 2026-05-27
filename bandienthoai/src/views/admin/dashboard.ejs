@@ -1,5 +1,14 @@
 <% const data = items || summary || item || {}; %>
 <% const revenue = Number(data.totalRevenue || 0); %>
+<% const chartRows = Array.isArray(revenueChart) ? revenueChart : []; %>
+<% const maxChartRevenue = chartRows.reduce(function(max, row) { return Math.max(max, Number(row.value || 0)); }, 0); %>
+<% const revenueGrowth = Number(data.revenueGrowthPercent || 0); %>
+<% const orderGrowth = Number(data.orderGrowthPercent || 0); %>
+<% const formatPercent = function(value) { return (value > 0 ? '+' : '') + value.toLocaleString('vi-VN') + '%'; }; %>
+<% const topProductRows = Array.isArray(topProducts) ? topProducts : []; %>
+<% const recentOrderRows = Array.isArray(recentOrders) ? recentOrders : []; %>
+<% const formatMoney = function(value) { return Number(value || 0).toLocaleString('vi-VN') + ' đ'; }; %>
+<% const statusMap = { pending: 'Chờ xác nhận', confirmed: 'Đã xác nhận', preparing: 'Đang pha chế', ready: 'Sẵn sàng', delivering: 'Đang giao', completed: 'Hoàn thành', cancelled: 'Đã hủy' }; %>
 
 <section class='admin-dashboard'>
   <div class='admin-page-title'>
@@ -12,14 +21,14 @@
       <span class='metric-card__icon is-green'>VND</span>
       <small>Tổng doanh thu</small>
       <strong><%= revenue.toLocaleString('vi-VN') %> đ</strong>
-      <em>+ 12.5% so với hôm qua</em>
+      <em><%= formatPercent(revenueGrowth) %> so với hôm qua</em>
     </article>
 
     <article class='metric-card'>
       <span class='metric-card__icon is-peach'>OD</span>
       <small>Tổng đơn hàng</small>
       <strong><%= Number(data.totalOrders || 0).toLocaleString('vi-VN') %></strong>
-      <em>+ 8.7% so với hôm qua</em>
+      <em><%= formatPercent(orderGrowth) %> so với hôm qua</em>
     </article>
 
     <article class='metric-card'>
@@ -47,8 +56,13 @@
         <a href='/admin/statistics'>Xem báo cáo</a>
       </div>
       <div class='bar-chart' aria-label='Biểu đồ doanh thu'>
-        <% [42, 48, 61, 44, 45, 64, 63].forEach(function(value, index) { %>
-          <span style='--h:<%= value %>%' data-label='<%= 12 + index %>/05'></span>
+        <% chartRows.forEach(function(row, index) { %>
+          <%
+            const chartValue = Number(row.value || 0);
+            const chartHeight = maxChartRevenue > 0 ? Math.max(4, Math.round((chartValue / maxChartRevenue) * 100)) : 0;
+            const chartMoney = chartValue.toLocaleString('vi-VN') + ' đ';
+          %>
+          <span style='--h:<%= chartHeight %>%; --i:<%= index %>' data-label='<%= row.displayLabel || row.label %>' data-value='<%= chartMoney %>' title='<%= (row.displayLabel || row.label) + ": " + chartMoney %>'></span>
         <% }) %>
       </div>
     </section>
@@ -59,22 +73,27 @@
         <a href='/admin/products'>Xem tất cả</a>
       </div>
       <ul class='top-products'>
-        <% [
-          ['Cà phê sữa đá', 'Đã bán: 156 ly', '31.200.000 đ'],
-          ['Bạc xỉu', 'Đã bán: 132 ly', '23.760.000 đ'],
-          ['Cappuccino', 'Đã bán: 98 ly', '19.600.000 đ'],
-          ['Cold Brew', 'Đã bán: 85 ly', '17.850.000 đ'],
-          ['Matcha Latte', 'Đã bán: 74 ly', '14.800.000 đ']
-        ].forEach(function(product, index) { %>
+        <% if (topProductRows.length) { %>
+        <% topProductRows.forEach(function(product, index) { %>
           <li>
             <span><%= index + 1 %></span>
             <div>
-              <strong><%= product[0] %></strong>
-              <small><%= product[1] %></small>
+              <strong><%= product.name || 'Sản phẩm #' + (product.id || '-') %></strong>
+              <small>Đã bán: <%= Number(product.total_sold || 0).toLocaleString('vi-VN') %> món</small>
             </div>
-            <em><%= product[2] %></em>
+            <em><%= formatMoney(product.total_revenue) %></em>
           </li>
         <% }) %>
+        <% } else { %>
+          <li>
+            <span>-</span>
+            <div>
+              <strong>Chưa có dữ liệu</strong>
+              <small>Chưa có đơn hoàn thành</small>
+            </div>
+            <em>0 đ</em>
+          </li>
+        <% } %>
       </ul>
     </section>
 
@@ -94,19 +113,20 @@
             </tr>
           </thead>
           <tbody>
-            <% [
-              ['#DH0256', 'Trần Minh Tâm', '195.000 đ', 'Hoàn thành'],
-              ['#DH0255', 'Nguyễn Hoàng Anh', '245.000 đ', 'Đang pha chế'],
-              ['#DH0254', 'Lê Quang Huy', '120.000 đ', 'Đang giao'],
-              ['#DH0253', 'Phạm Thu Trang', '320.000 đ', 'Hoàn thành']
-            ].forEach(function(order) { %>
+            <% if (recentOrderRows.length) { %>
+            <% recentOrderRows.forEach(function(order) { %>
               <tr>
-                <td><%= order[0] %></td>
-                <td><%= order[1] %></td>
-                <td><%= order[2] %></td>
-                <td><span class='status-pill'><%= order[3] %></span></td>
+                <td><%= order.order_code || '#' + order.id %></td>
+                <td><%= order.receiver_name || order.customer_name || 'Khách tại quán' %></td>
+                <td><%= formatMoney(order.total_amount) %></td>
+                <td><span class='status-pill'><%= statusMap[order.status] || order.status || '-' %></span></td>
               </tr>
             <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan='4'>Chưa có đơn hàng.</td>
+              </tr>
+            <% } %>
           </tbody>
         </table>
       </div>

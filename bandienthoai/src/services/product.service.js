@@ -88,7 +88,23 @@ async function getAvailableProducts(limit) {
 }
 
 async function getFeaturedProducts(...args) {
-  return getAvailableProducts(args[0] || 8);
+  const safeLimit = normalizeLimit(args[0] || 8);
+  const [rows] = await db.execute(
+    `SELECT p.*, COALESCE(s.total_sold, 0) AS total_sold
+     FROM products p
+     LEFT JOIN (
+       SELECT oi.product_id, SUM(oi.quantity) AS total_sold
+       FROM order_items oi
+       INNER JOIN orders o ON o.id = oi.order_id
+       WHERE o.status = 'completed'
+       GROUP BY oi.product_id
+     ) s ON s.product_id = p.id
+     WHERE p.status = ?
+     ORDER BY COALESCE(s.total_sold, 0) DESC, p.id DESC
+     LIMIT ${safeLimit}`,
+    ['available']
+  );
+  return rows;
 }
 
 
