@@ -6,7 +6,10 @@
   <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Brew Haven</title>
   <link rel='stylesheet' href='/css/style.css'>
 </head>
-<body class='<%= typeof pageClass !== "undefined" ? pageClass : "" %>'>
+<%
+  const isTableOrderMode = typeof tableOrder !== 'undefined' && tableOrder;
+%>
+<body class='<%= typeof pageClass !== "undefined" ? pageClass : "" %><%= isTableOrderMode ? " table-order-mode" : "" %>'>
   <% if (typeof toast !== 'undefined' && toast) { %>
     <div class='app-toast app-toast--<%= toast.type || "success" %>' role='status' aria-live='polite'>
       <span class='app-toast__icon' aria-hidden='true'>✓</span>
@@ -18,99 +21,100 @@
     </div>
   <% } %>
 
-  <header class='brew-header'>
-    <div class='container'>
-      <nav class='navbar'>
-        <a href='/' class='navbar-brand' aria-label='Brew Haven home'>
-          <img src='/images/logo/main_logo.png' alt='Brew Haven' class='logo' onerror="this.style.display='none';">
-          <span class='logo-text'>Brew Haven</span>
-        </a>
-
-        <div class='navbar-menu'>
-          <a href='/products' class='nav-link'>Menu</a>
-          <a href='/promotions' class='nav-link'>Promotions</a>
-          <a href='/reservation' class='nav-link'>Reservation</a>
-          <a href='/orders' class='nav-link'>Order Tracking</a>
-        </div>
-
-        <div class='navbar-account'>
-          <% if (typeof tableOrder !== 'undefined' && tableOrder) { %>
-            <span class='table-order-pill'><%= tableOrder.label || 'Đặt tại bàn' %></span>
-          <% } %>
-          <a href='/cart' class='cart-nav-link' aria-label='Xem giỏ hàng'>
-            <img src='/icon/giohang.png' alt='Giỏ hàng'>
+  <% if (!isTableOrderMode) { %>
+    <header class='brew-header'>
+      <div class='container'>
+        <nav class='navbar'>
+          <a href='/' class='navbar-brand' aria-label='Brew Haven home'>
+            <img src='/images/logo/main_logo.png' alt='Brew Haven' class='logo' onerror="this.style.display='none';">
+            <span class='logo-text'>Brew Haven</span>
           </a>
-          <% if (currentUser) { %>
-            <a href='/profile' class='account-link'><span aria-hidden='true'>👤</span><%= currentUser.full_name || 'Account' %></a>
-          <% } else { %>
-            <a href='/login' class='account-link'><span aria-hidden='true'>👤</span>Login / Register</a>
-          <% } %>
-        </div>
 
-        <div class='navbar-actions'>
-          <button class='mobile-menu-toggle' id='mobileMenuToggle' aria-label='Open menu'>
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-      </nav>
-    </div>
-  </header>
+          <div class='navbar-menu'>
+            <a href='/products' class='nav-link'>Menu</a>
+            <a href='/promotions' class='nav-link'>Promotions</a>
+            <a href='/reservation' class='nav-link'>Reservation</a>
+            <a href='/orders' class='nav-link'>Order Tracking</a>
+          </div>
 
-  <main class='container page <%= typeof pageClass !== "undefined" ? pageClass : "" %>'>
+          <div class='navbar-account'>
+            <a href='/cart' class='cart-nav-link' aria-label='Xem giỏ hàng'>
+              <img src='/icon/giohang.png' alt='Giỏ hàng'>
+            </a>
+            <% if (currentUser) { %>
+              <a href='/profile' class='account-link'><span aria-hidden='true'>👤</span><%= currentUser.full_name || 'Account' %></a>
+            <% } else { %>
+              <a href='/login' class='account-link'><span aria-hidden='true'>👤</span>Login / Register</a>
+            <% } %>
+          </div>
+
+          <div class='navbar-actions'>
+            <button class='mobile-menu-toggle' id='mobileMenuToggle' aria-label='Open menu'>
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>
+  <% } %>
+
+  <main class='container page <%= typeof pageClass !== "undefined" ? pageClass : "" %><%= isTableOrderMode ? " table-order-page" : "" %>'>
     <div class='page__content'>
       <%- body %>
     </div>
   </main>
 
-  <footer class='brew-footer'>
-    <div class='container'>
-      <div class='footer-content'>
-        <div class='footer-section'>
-          <div class='footer-brand'>
-            <img src='/images/logo/brew-haven-logo.png' alt='Brew Haven' class='footer-logo' onerror="this.style.display='none';">
-            <span class='footer-logo-cup' aria-hidden='true'>☕</span>
-            <span class='footer-logo-text'>Brew Haven</span>
-            <p class='footer-description'>Brew Haven is your neighbourhood coffee shop, serving handcrafted drinks and sweet moments every day.</p>
+  <% if (!isTableOrderMode) { %>
+    <footer class='brew-footer'>
+      <div class='container'>
+        <div class='footer-content'>
+          <div class='footer-section'>
+            <div class='footer-brand'>
+              <img src='/images/logo/brew-haven-logo.png' alt='Brew Haven' class='footer-logo' onerror="this.style.display='none';">
+              <span class='footer-logo-cup' aria-hidden='true'>☕</span>
+              <span class='footer-logo-text'>Brew Haven</span>
+              <p class='footer-description'>Brew Haven is your neighbourhood coffee shop, serving handcrafted drinks and sweet moments every day.</p>
+            </div>
+          </div>
+
+          <div class='footer-section'>
+            <h3 class='footer-title'>Quick Links</h3>
+            <ul class='footer-links'>
+              <li><a href='/products'>Menu</a></li>
+              <li><a href='/promotions'>Promotions</a></li>
+              <li><a href='/reservation'>Reservation</a></li>
+              <li><a href='/orders'>Order Tracking</a></li>
+            </ul>
+          </div>
+
+          <div class='footer-section'>
+            <h3 class='footer-title'>Contact Us</h3>
+            <ul class='footer-links'>
+              <li><a href='tel:09031234567'>0903 123 4567</a></li>
+              <li><a href='mailto:hello@brewhaven.vn'>hello@brewhaven.vn</a></li>
+              <li><a href='/contact'>Contact Form</a></li>
+              <li>Mon - Sun: 07:00 - 22:00</li>
+            </ul>
+          </div>
+
+          <div class='footer-section'>
+            <h3 class='footer-title'>Our Address</h3>
+            <ul class='footer-links'>
+              <li>123 Nguyễn Huệ, Phường Bến Nghé</li>
+              <li>Quận 1, TP. Hồ Chí Minh, Việt Nam</li>
+              <li><a href='https://maps.google.com'>Get Directions</a></li>
+            </ul>
           </div>
         </div>
 
-        <div class='footer-section'>
-          <h3 class='footer-title'>Quick Links</h3>
-          <ul class='footer-links'>
-            <li><a href='/products'>Menu</a></li>
-            <li><a href='/promotions'>Promotions</a></li>
-            <li><a href='/reservation'>Reservation</a></li>
-            <li><a href='/orders'>Order Tracking</a></li>
-          </ul>
-        </div>
-
-        <div class='footer-section'>
-          <h3 class='footer-title'>Contact Us</h3>
-          <ul class='footer-links'>
-            <li><a href='tel:09031234567'>0903 123 4567</a></li>
-            <li><a href='mailto:hello@brewhaven.vn'>hello@brewhaven.vn</a></li>
-            <li><a href='/contact'>Contact Form</a></li>
-            <li>Mon - Sun: 07:00 - 22:00</li>
-          </ul>
-        </div>
-
-        <div class='footer-section'>
-          <h3 class='footer-title'>Our Address</h3>
-          <ul class='footer-links'>
-            <li>123 Nguyễn Huệ, Phường Bến Nghé</li>
-            <li>Quận 1, TP. Hồ Chí Minh, Việt Nam</li>
-            <li><a href='https://maps.google.com'>Get Directions</a></li>
-          </ul>
+        <div class='footer-bottom'>
+          <p>&copy; <%= new Date().getFullYear() %> Brew Haven. All rights reserved.</p>
         </div>
       </div>
-
-      <div class='footer-bottom'>
-        <p>&copy; <%= new Date().getFullYear() %> Brew Haven. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+    </footer>
+  <% } %>
 
   <script src='/js/main.js'></script>
 </body>

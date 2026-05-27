@@ -1,0 +1,54 @@
+{
+  "baseUrl": "http://10.80.243.92:3000",
+  "generatedAt": "2026-05-27T06:34:59.318Z",
+  "tables": [
+    {
+      "code": "T01",
+      "label": "Bàn 01",
+      "url": "http://10.80.243.92:3000/table/T01",
+      "fileName": "T01.svg"
+    },
+    {
+      "code": "T02",
+      "label": "Bàn 02",
+      "url": "http://10.80.243.92:3000/table/T02",
+      "fileName": "T02.svg"
+    },
+    {
+      "code": "T03",
+      "label": "Bàn 03",
+      "url": "http://10.80.243.92:3000/table/T03",
+      "fileName": "T03.svg"
+    },
+    {
+      "code": "T04",
+      "label": "Bàn 04",
+      "url": "http://10.80.243.92:3000/table/T04",
+      "fileName": "T04.svg"
+    },
+    {
+      "code": "T05",
+      "label": "Bàn 05",
+      "url": "http://10.80.243.92:3000/table/T05",
+      "fileName": "T05.svg"
+    },
+    {
+      "code": "T06",
+      "label": "Bàn 06",
+      "url": "http://10.80.243.92:3000/table/T06",
+      "fileName": "T06.svg"
+    },
+    {
+      "code": "T07",
+      "label": "Bàn 07",
+      "url": "http://10.80.243.92:3000/table/T07",
+      "fileName": "T07.svg"
+    },
+    {
+      "code": "T08",
+      "label": "Bàn 08",
+      "url": "http://10.80.243.92:3000/table/T08",
+      "fileName": "T08.svg"
+    }
+  ]
+}

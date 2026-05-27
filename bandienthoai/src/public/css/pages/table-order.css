@@ -1,0 +1,402 @@
+/* Compact QR/table ordering mode. Loaded last so it can simplify page styles. */
+body.table-order-mode {
+  --table-ink: #241812;
+  --table-muted: #6f665f;
+  --table-green: #536b2e;
+  --table-line: #e7ddd2;
+  --table-paper: #fffdf9;
+  background: #faf8f5;
+  color: var(--table-ink);
+}
+
+body.table-order-mode .container {
+  width: min(100%, 720px);
+  max-width: 100%;
+}
+
+body.table-order-mode .page {
+  min-height: 100vh;
+  padding: 0;
+}
+
+body.table-order-mode .page__content {
+  min-height: 100vh;
+  padding: 0 12px 92px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #faf8f5 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+body.table-order-mode .app-toast {
+  left: 12px;
+  right: 12px;
+  width: auto;
+}
+
+body.table-order-mode .menu-hero,
+body.table-order-mode .cart-page-head {
+  margin: 0 -12px;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--table-line);
+  background: var(--table-paper);
+}
+
+body.table-order-mode .menu-hero {
+  display: grid;
+  gap: 12px;
+}
+
+body.table-order-mode .menu-eyebrow {
+  display: none;
+}
+
+body.table-order-mode .menu-hero h1,
+body.table-order-mode .cart-page-head h1 {
+  margin: 0 0 4px;
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+body.table-order-mode .menu-hero p:not(.menu-eyebrow),
+body.table-order-mode .cart-page-head p {
+  max-width: none;
+  color: var(--table-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+body.table-order-mode .menu-search {
+  width: 100%;
+  gap: 8px;
+}
+
+body.table-order-mode .menu-search input,
+body.table-order-mode .menu-search button {
+  height: 42px;
+  font-size: 13px;
+}
+
+body.table-order-mode .menu-search button {
+  padding: 0 14px;
+  background: var(--table-green);
+}
+
+body.table-order-mode .table-order-banner,
+body.table-order-mode .cart-table-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #cfdcbf;
+  border-radius: 8px;
+  background: #f5faef;
+  color: var(--table-ink);
+}
+
+body.table-order-mode .table-order-banner div,
+body.table-order-mode .cart-table-banner span {
+  min-width: 0;
+}
+
+body.table-order-mode .table-order-banner strong,
+body.table-order-mode .cart-table-banner strong {
+  display: block;
+  color: var(--table-green);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+body.table-order-mode .table-order-banner span,
+body.table-order-mode .cart-table-banner span {
+  display: block;
+  margin-top: 2px;
+  color: var(--table-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+body.table-order-mode .table-order-banner a,
+body.table-order-mode .cart-table-banner button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--table-green);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+body.table-order-mode .cart-table-banner form {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+
+body.table-order-mode .cart-table-banner > strong,
+body.table-order-mode .cart-table-banner > span {
+  grid-column: 1;
+}
+
+body.table-order-mode .menu-tabs {
+  margin: 0 -12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--table-line);
+  background: #faf8f5;
+  gap: 8px;
+}
+
+body.table-order-mode .menu-tabs a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+body.table-order-mode .menu-grid {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 0 0 18px;
+}
+
+body.table-order-mode .menu-card {
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 110px;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+body.table-order-mode .menu-card__media {
+  width: 86px;
+  height: 86px;
+}
+
+body.table-order-mode .menu-card h2 {
+  font-size: 14px;
+}
+
+body.table-order-mode .menu-card__top span {
+  font-size: 13px;
+}
+
+body.table-order-mode .menu-card p {
+  display: -webkit-box;
+  margin: 5px 0 8px;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 11px;
+}
+
+body.table-order-mode .menu-card__actions > a {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+body.table-order-mode .menu-card__actions button {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+body.table-order-mode .pd-breadcrumb,
+body.table-order-mode .pd-rating,
+body.table-order-mode .pd-label,
+body.table-order-mode .pd-badge,
+body.table-order-mode .pd-related,
+body.table-order-mode .pd-reviews {
+  display: none;
+}
+
+body.table-order-mode .pd-shell {
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding-top: 12px;
+}
+
+body.table-order-mode .pd-media {
+  height: min(58vw, 300px);
+  border-radius: 8px;
+}
+
+body.table-order-mode .pd-info h1 {
+  margin: 0 0 8px;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+body.table-order-mode .pd-desc {
+  margin: 8px 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+body.table-order-mode .pd-price {
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+body.table-order-mode .pd-form {
+  gap: 12px;
+}
+
+body.table-order-mode .pd-options {
+  gap: 8px;
+}
+
+body.table-order-mode .pd-options--topping,
+body.table-order-mode .pd-options--level {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.table-order-mode .pd-option {
+  min-height: 48px;
+  padding: 7px;
+}
+
+body.table-order-mode .pd-note {
+  min-height: 42px;
+}
+
+body.table-order-mode .pd-actions {
+  grid-template-columns: 1fr;
+}
+
+body.table-order-mode .pd-buy {
+  display: none;
+}
+
+body.table-order-mode .cart-page-head h1 span,
+body.table-order-mode .cart-discount,
+body.table-order-mode .cart-points,
+body.table-order-mode .cart-secure-note {
+  display: none;
+}
+
+body.table-order-mode .cart-checkout-layout,
+body.table-order-mode .cart-order-form {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+body.table-order-mode .cart-checkout-layout {
+  margin-top: 10px;
+}
+
+body.table-order-mode .cart-panel {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+body.table-order-mode .cart-panel__head,
+body.table-order-mode .cart-summary-panel,
+body.table-order-mode .cart-option-panel,
+body.table-order-mode .cart-details-panel,
+body.table-order-mode .cart-payment-panel {
+  padding: 12px;
+}
+
+body.table-order-mode .cart-items {
+  padding: 0 10px 10px;
+}
+
+body.table-order-mode .cart-item-card {
+  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-areas:
+    'media info'
+    'media controls';
+  gap: 8px 10px;
+  min-height: 0;
+  padding: 8px;
+}
+
+body.table-order-mode .cart-item-card__media {
+  grid-area: media;
+  width: 74px;
+  height: 74px;
+}
+
+body.table-order-mode .cart-item-card__info {
+  grid-area: info;
+}
+
+body.table-order-mode .cart-item-card h2 {
+  font-size: 13px;
+}
+
+body.table-order-mode .cart-badge,
+body.table-order-mode .cart-item-card p:nth-of-type(3) {
+  display: none;
+}
+
+body.table-order-mode .cart-item-card p {
+  font-size: 10px;
+}
+
+body.table-order-mode .cart-item-card__controls {
+  grid-area: controls;
+  grid-template-columns: auto 1fr 26px;
+  justify-items: end;
+}
+
+body.table-order-mode .cart-qty {
+  grid-column: auto;
+  grid-template-columns: 28px 30px 28px;
+  height: 28px;
+}
+
+body.table-order-mode .cart-add-more,
+body.table-order-mode .cart-place-order {
+  height: 46px;
+}
+
+body.table-order-mode .cart-place-order {
+  position: sticky;
+  bottom: 12px;
+  z-index: 20;
+  font-size: 15px;
+}
+
+body.table-order-mode .cart-field-grid,
+body.table-order-mode .cart-option-grid,
+body.table-order-mode .cart-option-grid--payment {
+  grid-template-columns: 1fr;
+}
+
+body.table-order-mode .cart-empty {
+  margin: 12px 0 0;
+  padding: 38px 16px;
+}
+
+@media (max-width: 420px) {
+  body.table-order-mode .menu-card {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  body.table-order-mode .menu-card__media {
+    width: 78px;
+    height: 78px;
+  }
+
+  body.table-order-mode .table-order-banner,
+  body.table-order-mode .cart-table-banner {
+    grid-template-columns: 1fr;
+  }
+
+  body.table-order-mode .table-order-banner a,
+  body.table-order-mode .cart-table-banner button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR đặt món theo bàn</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; color: #241812; background: #f6f2ec; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0; }
+    header { margin-bottom: 18px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    header p { margin: 0; color: #6f665f; }
+    .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .qr-card { break-inside: avoid; padding: 18px; border: 1px solid #ded2c5; border-radius: 8px; background: #fff; text-align: center; }
+    .qr-card img { width: 172px; height: 172px; }
+    .qr-card h2 { margin: 10px 0 2px; font-size: 20px; }
+    .qr-card p { margin: 0 0 8px; color: #536b2e; font-weight: 800; }
+    .qr-card small { display: block; overflow-wrap: anywhere; color: #7b7169; font-size: 10px; line-height: 1.35; }
+    @media print {
+      body { background: #fff; }
+      main { width: 100%; padding: 0; }
+      header { display: none; }
+      .qr-grid { grid-template-columns: repeat(2, 1fr); gap: 10mm; }
+      .qr-card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>QR đặt món theo bàn</h1>
+      <p>Base URL: http://10.80.243.92:3000</p>
+    </header>
+    <section class="qr-grid">
+      
+      <article class="qr-card">
+        <img src="./T01.svg" alt="QR Bàn 01">
+        <h2>Bàn 01</h2>
+        <p>T01</p>
+        <small>http://10.80.243.92:3000/table/T01</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T02.svg" alt="QR Bàn 02">
+        <h2>Bàn 02</h2>
+        <p>T02</p>
+        <small>http://10.80.243.92:3000/table/T02</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T03.svg" alt="QR Bàn 03">
+        <h2>Bàn 03</h2>
+        <p>T03</p>
+        <small>http://10.80.243.92:3000/table/T03</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T04.svg" alt="QR Bàn 04">
+        <h2>Bàn 04</h2>
+        <p>T04</p>
+        <small>http://10.80.243.92:3000/table/T04</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T05.svg" alt="QR Bàn 05">
+        <h2>Bàn 05</h2>
+        <p>T05</p>
+        <small>http://10.80.243.92:3000/table/T05</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T06.svg" alt="QR Bàn 06">
+        <h2>Bàn 06</h2>
+        <p>T06</p>
+        <small>http://10.80.243.92:3000/table/T06</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T07.svg" alt="QR Bàn 07">
+        <h2>Bàn 07</h2>
+        <p>T07</p>
+        <small>http://10.80.243.92:3000/table/T07</small>
+      </article>
+
+      <article class="qr-card">
+        <img src="./T08.svg" alt="QR Bàn 08">
+        <h2>Bàn 08</h2>
+        <p>T08</p>
+        <small>http://10.80.243.92:3000/table/T08</small>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
