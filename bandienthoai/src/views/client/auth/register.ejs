@@ -1,0 +1,105 @@
+<section class='register-shell'>
+  <div class='register-visual'>
+    <img src='/images/logo/logo1.jpg' alt='Brew Haven coffee' onerror="this.style.display='none';">
+    <div class='register-visual__copy'>
+      <h1>Welcome to<br>Brew Haven</h1>
+      <p>Create your account and start managing your coffee experience with ease.</p>
+      <span aria-hidden='true'>*</span>
+    </div>
+  </div>
+
+  <div class='register-panel'>
+    <div class='register-card'>
+      <h1>Create Account</h1>
+      <p>Join Brew Haven and unlock a better way to enjoy your coffee journey.</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class='register-error'><%= error %></div>
+      <% } %>
+
+      <form method='post' action='/register' class='register-form'>
+        <label>
+          <span>Full Name</span>
+          <div class='register-field'>
+            <span aria-hidden='true'>U</span>
+            <input type='text' name='full_name' placeholder='Enter your full name' autocomplete='name' required>
+          </div>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <div class='register-field'>
+            <span aria-hidden='true'>@</span>
+            <input type='email' name='email' placeholder='Enter your email' autocomplete='email' required>
+          </div>
+        </label>
+
+        <label>
+          <span>Phone Number <small>(Optional)</small></span>
+          <div class='register-field'>
+            <span aria-hidden='true'>P</span>
+            <input type='text' name='phone' placeholder='Enter your phone number' autocomplete='tel'>
+          </div>
+        </label>
+
+        <label>
+          <span>Address <small>(Optional)</small></span>
+          <div class='register-field'>
+            <span aria-hidden='true'>A</span>
+            <input type='text' name='address' placeholder='Enter your address' autocomplete='street-address'>
+          </div>
+        </label>
+
+        <label>
+          <span>Password</span>
+          <div class='register-field'>
+            <span aria-hidden='true'>#</span>
+            <input id='registerPassword' type='password' name='password' placeholder='Create a password' autocomplete='new-password' required>
+            <button type='button' class='register-password-toggle' data-target='registerPassword' aria-label='Show password'>Show</button>
+          </div>
+        </label>
+
+        <label>
+          <span>Confirm Password</span>
+          <div class='register-field'>
+            <span aria-hidden='true'>#</span>
+            <input id='registerConfirmPassword' type='password' name='confirm_password' placeholder='Confirm your password' autocomplete='new-password' required>
+            <button type='button' class='register-password-toggle' data-target='registerConfirmPassword' aria-label='Show password'>Show</button>
+          </div>
+        </label>
+
+        <label class='register-terms'>
+          <input type='checkbox' name='terms' checked required>
+          <span>I agree to the <a href='/about'>Terms & Privacy Policy</a></span>
+        </label>
+
+        <button type='submit' class='register-submit'>Create Account</button>
+      </form>
+
+      <div class='register-divider'><span>or continue with</span></div>
+
+      <div class='register-social'>
+        <button type='button'><strong>G</strong>Continue with Google</button>
+        <button type='button'><strong>f</strong>Continue with Facebook</button>
+      </div>
+
+      <p class='register-login'>Already have an account? <a href='/login'>Login</a></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    document.querySelectorAll('.register-password-toggle').forEach(function(button) {
+      var input = document.getElementById(button.getAttribute('data-target'));
+      if (!input) return;
+
+      button.addEventListener('click', function() {
+        var isPassword = input.getAttribute('type') === 'password';
+        input.setAttribute('type', isPassword ? 'text' : 'password');
+        button.textContent = isPassword ? 'Hide' : 'Show';
+        button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      });
+    });
+  })();
+</script>

@@ -1,0 +1,272 @@
+<%
+  const rows = Array.isArray(items) ? items : [];
+  const selectedItem = typeof item !== 'undefined' ? item : null;
+  const selectedOrder = selectedItem || rows[0] || null;
+  const detailItems = typeof orderItems !== 'undefined' && Array.isArray(orderItems) ? orderItems : [];
+  const reviewRows = typeof reviews !== 'undefined' && Array.isArray(reviews) ? reviews : [];
+  const reviewMap = reviewRows.reduce(function(map, review) {
+    map[Number(review.order_item_id)] = review;
+    return map;
+  }, {});
+  const statusFlow = [
+    { key: 'pending', label: 'Chờ xác nhận', hint: 'Đơn đã được ghi nhận' },
+    { key: 'confirmed', label: 'Đã xác nhận', hint: 'Quán đang chuẩn bị đơn' },
+    { key: 'preparing', label: 'Đang chuẩn bị', hint: 'Barista đang làm món' },
+    { key: 'ready', label: 'Sẵn sàng', hint: 'Đơn đã sẵn sàng' },
+    { key: 'delivering', label: 'Đang giao', hint: 'Đơn đang trên đường' },
+    { key: 'completed', label: 'Hoàn tất', hint: 'Cảm ơn bạn đã đặt hàng' }
+  ];
+  const statusMap = {
+    pending: 'Chờ xác nhận',
+    confirmed: 'Đã xác nhận',
+    preparing: 'Đang chuẩn bị',
+    ready: 'Sẵn sàng',
+    delivering: 'Đang giao',
+    completed: 'Hoàn tất',
+    cancelled: 'Đã hủy'
+  };
+  const paymentMap = {
+    cash: 'Tiền mặt',
+    bank_transfer: 'Chuyển khoản',
+    e_wallet: 'Ví điện tử'
+  };
+  const orderTypeMap = {
+    dine_in: 'Dùng tại quán',
+    takeaway: 'Mang đi',
+    delivery: 'Giao hàng'
+  };
+  const money = function(value) {
+    return Number(value || 0).toLocaleString('vi-VN') + 'đ';
+  };
+  const date = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+  };
+  const time = function(value) {
+    return value ? new Date(value).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+  };
+  const activeIndex = selectedOrder && selectedOrder.status !== 'cancelled'
+    ? Math.max(0, statusFlow.findIndex(function(step) { return step.key === selectedOrder.status; }))
+    : -1;
+  const canCancel = selectedOrder && ['pending', 'confirmed'].includes(selectedOrder.status);
+%>
+
+<section class='orders-page'>
+  <div class='action-hero orders-hero'>
+    <div class='action-hero__copy'>
+      <span class='action-eyebrow'>Order Tracking</span>
+      <h1>Theo dõi đơn hàng</h1>
+      <p>Kiểm tra trạng thái xử lý, thông tin nhận hàng và từng món trong đơn của bạn tại Brew Haven.</p>
+      <div class='action-hero__actions'>
+        <a href='/products'>Đặt thêm món</a>
+        <a href='/profile'>Hồ sơ của tôi</a>
+      </div>
+    </div>
+    <div class='action-hero__media orders-hero__media'>
+      <img src='/images/products/cf-sua-da.jpg' alt='Brew Haven order tracking'>
+      <div class='orders-hero__ticket'>
+        <span>Đơn gần nhất</span>
+        <strong><%= selectedOrder ? (selectedOrder.order_code || '#' + selectedOrder.id) : 'Chưa có đơn' %></strong>
+        <% if (selectedOrder) { %>
+          <em class='order-status is-<%= selectedOrder.status || "pending" %>'><%= statusMap[selectedOrder.status] || selectedOrder.status %></em>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <% if (!rows.length) { %>
+    <div class='action-empty orders-empty'>
+      <span class='orders-empty__icon' aria-hidden='true'>+</span>
+      <h3>Bạn chưa có đơn hàng</h3>
+      <p>Khi bạn đặt món, trạng thái xử lý và thông tin giao hàng sẽ xuất hiện tại đây.</p>
+      <a href='/products'>Khám phá menu</a>
+    </div>
+  <% } else { %>
+    <div class='orders-dashboard'>
+      <aside class='orders-list'>
+        <div class='action-section__head orders-list__head'>
+          <div>
+            <span class='action-eyebrow'>History</span>
+            <h2>Lịch sử đơn</h2>
+          </div>
+          <strong><%= rows.length %></strong>
+        </div>
+
+        <div class='orders-list__scroll'>
+          <% rows.forEach(function(order) { %>
+            <% const active = selectedOrder && Number(selectedOrder.id) === Number(order.id); %>
+            <a class='order-card <%= active ? "is-active" : "" %>' href='/orders/<%= order.id %>'>
+              <span class='order-card__marker' aria-hidden='true'></span>
+              <span class='order-card__main'>
+                <strong><%= order.order_code || '#' + order.id %></strong>
+                <small><%= date(order.created_at) %> <%= time(order.created_at) %></small>
+              </span>
+              <span class='order-card__meta'>
+                <em class='order-status is-<%= order.status || "pending" %>'><%= statusMap[order.status] || order.status || 'Chờ xác nhận' %></em>
+                <b><%= money(order.total_amount) %></b>
+              </span>
+            </a>
+          <% }) %>
+        </div>
+      </aside>
+
+      <div class='orders-detail'>
+        <section class='order-overview'>
+          <div>
+            <span class='action-eyebrow'>Selected Order</span>
+            <h2><%= selectedOrder.order_code || '#' + selectedOrder.id %></h2>
+            <p>Đặt lúc <%= time(selectedOrder.created_at) %>, <%= date(selectedOrder.created_at) %></p>
+          </div>
+          <div class='order-overview__total'>
+            <span>Tổng thanh toán</span>
+            <strong><%= money(selectedOrder.total_amount) %></strong>
+          </div>
+        </section>
+
+        <section class='order-progress <%= selectedOrder.status === "cancelled" ? "is-cancelled" : "" %>'>
+          <% if (selectedOrder.status === 'cancelled') { %>
+            <div class='order-cancelled'>
+              <strong>Đơn hàng đã hủy</strong>
+              <span>Nếu cần hỗ trợ thêm, bạn có thể liên hệ Brew Haven qua trang liên hệ.</span>
+            </div>
+          <% } else { %>
+            <% statusFlow.forEach(function(step, index) { %>
+              <div class='order-step <%= index <= activeIndex ? "is-done" : "" %> <%= index === activeIndex ? "is-current" : "" %>'>
+                <span><%= index + 1 %></span>
+                <div>
+                  <strong><%= step.label %></strong>
+                  <small><%= step.hint %></small>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </section>
+
+        <div class='orders-detail-grid'>
+          <section class='order-info-panel'>
+            <div class='orders-panel-head'>
+              <span class='action-eyebrow'>Delivery</span>
+              <h3>Thông tin nhận hàng</h3>
+            </div>
+            <dl>
+              <div>
+                <dt>Người nhận</dt>
+                <dd><%= selectedOrder.receiver_name || '-' %></dd>
+              </div>
+              <div>
+                <dt>Số điện thoại</dt>
+                <dd><%= selectedOrder.receiver_phone || '-' %></dd>
+              </div>
+              <div class='is-wide'>
+                <dt>Địa chỉ</dt>
+                <dd><%= selectedOrder.receiver_address || (selectedOrder.order_type === 'takeaway' ? 'Nhận tại quán' : '-') %></dd>
+              </div>
+              <div>
+                <dt>Hình thức</dt>
+                <dd><%= orderTypeMap[selectedOrder.order_type] || selectedOrder.order_type || '-' %></dd>
+              </div>
+              <div>
+                <dt>Thanh toán</dt>
+                <dd><%= paymentMap[selectedOrder.payment_method] || selectedOrder.payment_method || '-' %></dd>
+              </div>
+            </dl>
+            <% if (selectedOrder.note) { %>
+              <p class='order-note'><strong>Ghi chú:</strong> <%= selectedOrder.note %></p>
+            <% } %>
+          </section>
+
+          <section class='order-summary-panel'>
+            <div class='orders-panel-head'>
+              <span class='action-eyebrow'>Summary</span>
+              <h3>Chi phí</h3>
+            </div>
+            <dl>
+              <div>
+                <dt>Tạm tính</dt>
+                <dd><%= money(selectedOrder.subtotal) %></dd>
+              </div>
+              <div>
+                <dt>Giảm giá</dt>
+                <dd>-<%= money(selectedOrder.discount_amount) %></dd>
+              </div>
+              <div>
+                <dt>Phí giao hàng</dt>
+                <dd><%= money(selectedOrder.shipping_fee) %></dd>
+              </div>
+              <div class='order-summary-panel__total'>
+                <dt>Tổng tiền</dt>
+                <dd><%= money(selectedOrder.total_amount) %></dd>
+              </div>
+            </dl>
+            <% if (canCancel) { %>
+              <form method='post' action='/orders/<%= selectedOrder.id %>/cancel' onsubmit="return confirm('Bạn muốn hủy đơn hàng này?')">
+                <button type='submit'>Hủy đơn hàng</button>
+              </form>
+            <% } %>
+          </section>
+        </div>
+
+        <section class='order-items-panel'>
+          <div class='orders-panel-head'>
+            <span class='action-eyebrow'>Items</span>
+            <h3>Món đã đặt</h3>
+          </div>
+
+          <% if (detailItems.length) { %>
+            <div class='order-items'>
+              <% detailItems.forEach(function(orderItem) { %>
+                <% const review = reviewMap[Number(orderItem.id)]; %>
+                <article class='order-item'>
+                  <span class='order-item__image'>
+                    <% if (orderItem.image_url) { %>
+                      <img src='<%= orderItem.image_url %>' alt='<%= orderItem.product_name || "Sản phẩm" %>' onerror="this.style.display='none';">
+                    <% } %>
+                  </span>
+                  <span class='order-item__body'>
+                    <strong><%= orderItem.product_name || 'Sản phẩm #' + orderItem.product_id %></strong>
+                    <small>Số lượng: <%= orderItem.quantity || 0 %></small>
+                  </span>
+                  <span class='order-item__price'>
+                    <b><%= money(orderItem.unit_price) %></b>
+                    <small><%= money(Number(orderItem.unit_price || 0) * Number(orderItem.quantity || 0)) %></small>
+                  </span>
+
+                  <% if (selectedOrder.status === 'completed') { %>
+                    <div class='order-review-box'>
+                      <% if (review) { %>
+                        <div class='order-review-done'>
+                          <strong>Đã đánh giá: <%= '★'.repeat(Number(review.rating || 5)) %><%= '☆'.repeat(5 - Number(review.rating || 5)) %></strong>
+                          <% if (review.comment) { %>
+                            <span><%= review.comment %></span>
+                          <% } %>
+                        </div>
+                      <% } else { %>
+                        <form method='post' action='/orders/<%= selectedOrder.id %>/reviews' class='order-review-form'>
+                          <input type='hidden' name='order_item_id' value='<%= orderItem.id %>'>
+                          <input type='hidden' name='product_id' value='<%= orderItem.product_id %>'>
+                          <label>
+                            <span>Đánh giá món</span>
+                            <select name='rating'>
+                              <option value='5'>5 sao - Rất hài lòng</option>
+                              <option value='4'>4 sao - Hài lòng</option>
+                              <option value='3'>3 sao - Tạm ổn</option>
+                              <option value='2'>2 sao - Chưa tốt</option>
+                              <option value='1'>1 sao - Không hài lòng</option>
+                            </select>
+                          </label>
+                          <input type='text' name='comment' maxlength='500' placeholder='Chia sẻ cảm nhận của bạn về món này'>
+                          <button type='submit'>Gửi đánh giá</button>
+                        </form>
+                      <% } %>
+                    </div>
+                  <% } %>
+                </article>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class='order-items-empty'>Chưa có dữ liệu món cho đơn hàng này.</p>
+          <% } %>
+        </section>
+      </div>
+    </div>
+  <% } %>
+</section>

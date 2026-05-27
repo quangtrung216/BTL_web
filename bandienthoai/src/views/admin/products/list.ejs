@@ -1,0 +1,82 @@
+<% const rows = Array.isArray(items) ? items : []; %>
+<%
+  const money = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0
+  });
+
+  const statusMap = {
+    available: { label: 'Đang bán', className: '' },
+    out_of_stock: { label: 'Hết hàng', className: 'is-danger' },
+    hidden: { label: 'Đã ẩn', className: 'is-muted' }
+  };
+%>
+
+<div class='container'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Quản lý sản phẩm</h1>
+      <p>Theo dõi danh mục, giá bán, tồn kho và trạng thái hiển thị của sản phẩm.</p>
+    </div>
+    <a class='admin-link-button' href='/admin/products/create'>Thêm sản phẩm</a>
+  </div>
+
+  <% if (!rows.length) { %>
+    <p>Chưa có dữ liệu sản phẩm.</p>
+  <% } else { %>
+    <div class='admin-table-wrap'>
+      <table class='admin-table'>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Sản phẩm</th>
+            <th>Danh mục</th>
+            <th>Giá bán</th>
+            <th>Tồn kho</th>
+            <th>Trạng thái</th>
+            <th>Cập nhật</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.forEach(function(row) { %>
+            <% const status = statusMap[row.status] || { label: row.status || 'Không rõ', className: 'is-muted' }; %>
+            <tr>
+              <td><%= row.id %></td>
+              <td>
+                <div class='admin-product-cell'>
+                  <% if (row.image_url) { %>
+                    <img src='<%= row.image_url %>' alt='<%= row.name %>'>
+                  <% } else { %>
+                    <span class='admin-product-thumb'>SP</span>
+                  <% } %>
+                  <div>
+                    <strong><%= row.name %></strong>
+                    <small><%= row.description || 'Chưa có mô tả' %></small>
+                  </div>
+                </div>
+              </td>
+              <td>#<%= row.category_id %></td>
+              <td><%= money.format(Number(row.base_price || 0)) %></td>
+              <td><%= Number(row.stock_quantity || 0).toLocaleString('vi-VN') %></td>
+              <td><span class='status-pill <%= status.className %>'><%= status.label %></span></td>
+              <td><%= row.updated_at ? new Date(row.updated_at).toLocaleDateString('vi-VN') : '-' %></td>
+              <td>
+                <div class='admin-action-row'>
+                  <a class='admin-table-link' href='/admin/products/edit/<%= row.id %>'>Sửa</a>
+                  <form class='admin-inline-form' method='post' action='/admin/products/toggle-status/<%= row.id %>'>
+                    <button type='submit'><%= row.status === 'hidden' ? 'Hiện' : 'Ẩn' %></button>
+                  </form>
+                  <form class='admin-inline-form' method='post' action='/admin/products/delete/<%= row.id %>' onsubmit="return confirm('Bạn muốn xóa sản phẩm này?')">
+                    <button class='admin-danger-button' type='submit'>Xóa</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>

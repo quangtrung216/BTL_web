@@ -1,0 +1,81 @@
+<% const data = item || null; %>
+
+<% if (!data) { %>
+  <section class='profile-empty'>
+    <h1>Profile not found</h1>
+    <p>We could not load your account information.</p>
+  </section>
+<% } else { %>
+  <section class='profile-hero'>
+    <div class='profile-avatar'><%= String(data.full_name || data.email || 'U').charAt(0).toUpperCase() %></div>
+    <div>
+      <p class='profile-eyebrow'>My Account</p>
+      <h1><%= data.full_name || 'Brew Haven Customer' %></h1>
+      <p>Manage your personal information and keep your Brew Haven account up to date.</p>
+    </div>
+    <span class='profile-status'><%= data.status || 'active' %></span>
+  </section>
+
+  <section class='profile-layout'>
+    <aside class='profile-summary'>
+      <div class='profile-summary__avatar'><%= String(data.full_name || data.email || 'U').charAt(0).toUpperCase() %></div>
+      <h2><%= data.full_name || 'Customer' %></h2>
+      <p><%= data.email %></p>
+      <div class='profile-chip'><%= data.role_name || 'customer' %></div>
+      <div class='profile-meta'>
+        <div>
+          <span>Phone</span>
+          <strong><%= data.phone || 'Not updated' %></strong>
+        </div>
+        <div>
+          <span>Address</span>
+          <strong><%= data.address || 'Not updated' %></strong>
+        </div>
+      </div>
+      <div class='profile-side-actions'>
+        <a href='/change-password'>Change Password</a>
+        <form method='post' action='/logout'>
+          <button type='submit'>Logout</button>
+        </form>
+      </div>
+    </aside>
+
+    <div class='profile-card'>
+      <div class='profile-card__head'>
+        <div>
+          <h2>Personal Information</h2>
+          <p>Update the details shown on your account.</p>
+        </div>
+        <a href='/orders'>Order History</a>
+      </div>
+
+      <form method='post' action='/profile/update' class='profile-form'>
+        <label>
+          <span>Full Name</span>
+          <input type='text' name='full_name' value='<%= data.full_name || "" %>' required>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type='email' value='<%= data.email || "" %>' disabled>
+          <small>Email is used for login and cannot be changed here.</small>
+        </label>
+
+        <label>
+          <span>Phone</span>
+          <input type='text' name='phone' value='<%= data.phone || "" %>'>
+        </label>
+
+        <label>
+          <span>Address</span>
+          <input type='text' name='address' value='<%= data.address || "" %>'>
+        </label>
+
+        <div class='profile-form__actions'>
+          <button type='submit'>Save Changes</button>
+          <a href='/'>Back Home</a>
+        </div>
+      </form>
+    </div>
+  </section>
+<% } %>

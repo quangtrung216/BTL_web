@@ -1,0 +1,96 @@
+<% const rows = Array.isArray(items) ? items : []; %>
+<%
+  const statusMap = {
+    pending: { label: 'Chờ duyệt', className: 'is-warning' },
+    confirmed: { label: 'Đã xác nhận', className: 'is-info' },
+    completed: { label: 'Hoàn tất', className: '' },
+    cancelled: { label: 'Đã từ chối', className: 'is-danger' }
+  };
+  const date = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+  };
+  const time = function(value) {
+    return value ? String(value).slice(0, 5) : '-';
+  };
+%>
+
+<div class='container admin-reservations-page'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Phê duyệt đặt bàn</h1>
+      <p>Xem các yêu cầu đặt bàn từ khách hàng và xác nhận hoặc từ chối lịch hẹn.</p>
+    </div>
+  </div>
+
+  <% if (!rows.length) { %>
+    <p>Chưa có yêu cầu đặt bàn.</p>
+  <% } else { %>
+    <div class='admin-table-wrap'>
+      <table class='admin-table admin-reservations-table'>
+        <thead>
+          <tr>
+            <th>Mã đặt bàn</th>
+            <th>Khách hàng</th>
+            <th>Thời gian</th>
+            <th>Số khách</th>
+            <th>Bàn gợi ý</th>
+            <th>Ghi chú</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.forEach(function(row) { %>
+            <% const status = statusMap[row.status] || { label: row.status || 'Không rõ', className: 'is-muted' }; %>
+            <tr>
+              <td>
+                <strong><%= row.reservation_code || '#' + row.id %></strong>
+                <small class='admin-muted-text'>#<%= row.id %></small>
+              </td>
+              <td>
+                <strong><%= row.contact_name || row.customer_name || 'Khách hàng' %></strong>
+                <small class='admin-muted-text'><%= row.contact_phone || row.customer_email || '-' %></small>
+              </td>
+              <td>
+                <strong><%= date(row.reservation_date) %></strong>
+                <small class='admin-muted-text'><%= time(row.reservation_time) %></small>
+              </td>
+              <td><%= Number(row.guest_count || 0).toLocaleString('vi-VN') %></td>
+              <td>
+                <strong><%= row.table_name || 'Bàn #' + (row.table_id || '-') %></strong>
+                <small class='admin-muted-text'>Sức chứa: <%= row.table_capacity || '-' %></small>
+              </td>
+              <td><%= row.note || '-' %></td>
+              <td><span class='status-pill <%= status.className %>'><%= status.label %></span></td>
+              <td>
+                <div class='admin-action-row'>
+                  <% if (row.status === 'pending') { %>
+                    <form class='admin-inline-form' method='post' action='/admin/reservations/<%= row.id %>/status'>
+                      <input type='hidden' name='status' value='confirmed'>
+                      <button type='submit'>Xác nhận</button>
+                    </form>
+                    <form class='admin-inline-form' method='post' action='/admin/reservations/<%= row.id %>/status' onsubmit="return confirm('Bạn muốn từ chối yêu cầu đặt bàn này?')">
+                      <input type='hidden' name='status' value='cancelled'>
+                      <button class='admin-danger-button' type='submit'>Từ chối</button>
+                    </form>
+                  <% } else if (row.status === 'confirmed') { %>
+                    <form class='admin-inline-form' method='post' action='/admin/reservations/<%= row.id %>/status'>
+                      <input type='hidden' name='status' value='completed'>
+                      <button type='submit'>Hoàn tất</button>
+                    </form>
+                    <form class='admin-inline-form' method='post' action='/admin/reservations/<%= row.id %>/status' onsubmit="return confirm('Bạn muốn hủy lịch đặt bàn này?')">
+                      <input type='hidden' name='status' value='cancelled'>
+                      <button class='admin-danger-button' type='submit'>Hủy</button>
+                    </form>
+                  <% } else { %>
+                    <span class='admin-muted-text'>Không còn thao tác</span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>

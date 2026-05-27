@@ -1,0 +1,311 @@
+<%
+  const data = item || product || null;
+  const sizeOrder = { S: 1, M: 2, L: 3 };
+  const sizeList = Array.isArray(sizes)
+    ? sizes.slice().sort(function(a, b) {
+        const aName = String(a.size_name || a.name || '').toUpperCase();
+        const bName = String(b.size_name || b.name || '').toUpperCase();
+        return (sizeOrder[aName] || 99) - (sizeOrder[bName] || 99);
+      })
+    : [];
+  const toppingList = Array.isArray(toppings) ? toppings.slice(0, 4) : [];
+  const relatedList = Array.isArray(relatedProducts) ? relatedProducts.slice(0, 4) : [];
+  const reviewList = Array.isArray(reviews) ? reviews : [];
+  const activeTableOrder = typeof tableOrder !== 'undefined' && tableOrder ? tableOrder : null;
+  const reviewCount = reviewSummary ? Number(reviewSummary.count || 0) : reviewList.length;
+  const averageRating = reviewCount ? Number(reviewSummary.averageRating || 0) : 0;
+  const ratingText = reviewCount ? averageRating.toFixed(1) : 'Chưa có';
+  const ratingStars = function(value) {
+    const rounded = Math.round(Number(value || 0));
+    return '★'.repeat(rounded) + '☆'.repeat(Math.max(0, 5 - rounded));
+  };
+%>
+
+<% if (!data) { %>
+  <section class='pd-empty'>
+    <h1>Product Not Found</h1>
+    <p>The product you're looking for doesn't exist.</p>
+    <a href='/products'>Browse Menu</a>
+  </section>
+<% } else { %>
+  <section class='pd-breadcrumb'>
+    <a href='/'>Home</a>
+    <span>&gt;</span>
+    <a href='/products'>Menu</a>
+    <span>&gt;</span>
+    <strong><%= data.name %></strong>
+  </section>
+
+  <% if (activeTableOrder) { %>
+    <section class='table-order-banner'>
+      <div>
+        <strong>Đang đặt món cho <%= activeTableOrder.label %></strong>
+        <span>Món thêm vào giỏ sẽ được gửi tới đúng bàn này.</span>
+      </div>
+      <a href='/cart'>Xem giỏ hàng</a>
+    </section>
+  <% } %>
+
+  <section class='pd-shell'>
+    <div class='pd-media'>
+      <span class='pd-badge'>Bestseller</span>
+      <% if (data.image_url) { %>
+        <img src='<%= data.image_url %>' alt='<%= data.name %>' onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <span class='pd-image-placeholder'>No image</span>
+      <% } else { %>
+        <span class='pd-image-placeholder'>No image</span>
+      <% } %>
+    </div>
+
+    <div class='pd-info'>
+      <span class='pd-label'>Bestseller</span>
+      <h1><%= data.name %></h1>
+      <div class='pd-rating'>
+        <strong><%= ratingText %></strong>
+        <span><%= reviewCount ? ratingStars(averageRating) : '☆☆☆☆☆' %></span>
+        <em>(<%= reviewCount %> đánh giá)</em>
+        <i>|</i>
+        <em>Đánh giá từ khách đã mua</em>
+      </div>
+      <p class='pd-desc'><%= data.description || 'Freshly prepared Brew Haven favourite.' %></p>
+      <div class='pd-price' id='pdBasePrice' data-value='<%= Number(data.base_price || 0) %>'>
+        <%= Number(data.base_price || 0).toLocaleString('vi-VN') %>đ
+      </div>
+
+      <form method='post' action='/cart/add' class='pd-form'>
+        <input type='hidden' name='product_id' value='<%= data.id %>'>
+        <input type='hidden' name='quantity' id='pdQuantityHidden' value='1'>
+        <input type='hidden' name='size_id' id='pdSizeHidden' value=''>
+        <input type='hidden' name='toppings' id='pdToppingsHidden' value=''>
+
+        <div class='pd-group'>
+          <div class='pd-group__title'>Chọn kích cỡ</div>
+          <div class='pd-options pd-options--size'>
+            <% if (sizeList.length) { %>
+              <% const defaultSizeIndex = Math.max(0, sizeList.findIndex(function(s) { return Number(s.price || 0) === Number(data.base_price || 0); })); %>
+              <% sizeList.forEach(function(s, index) { %>
+                <label class='pd-option'>
+                  <input type='radio' name='size' value='<%= s.id %>' data-price='<%= Number(s.price || 0) %>' <%= index === defaultSizeIndex ? 'checked' : '' %>>
+                  <span><%= s.size_name || s.name || ['S', 'M', 'L'][index] || 'Size' %></span>
+                  <small><%= Number(s.price || 0).toLocaleString('vi-VN') %>đ</small>
+                </label>
+              <% }); %>
+            <% } else { %>
+              <% ['S', 'M', 'L'].forEach(function(label, index) { %>
+                <label class='pd-option'>
+                  <input type='radio' name='size' value='' data-price='0' <%= index === 1 ? 'checked' : '' %>>
+                  <span><%= label %></span>
+                  <small><%= Number(data.base_price || 0).toLocaleString('vi-VN') %>đ</small>
+                </label>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (toppingList.length) { %>
+          <div class='pd-group'>
+            <div class='pd-group__title'>Topping <small>(Chọn tối đa 2)</small></div>
+            <div class='pd-options pd-options--topping'>
+              <% toppingList.forEach(function(t) { %>
+                <label class='pd-option'>
+                  <input type='checkbox' name='topping_choice' value='<%= t.id %>' data-price='<%= Number(t.price || 0) %>'>
+                  <span><%= t.name %></span>
+                  <small>+<%= Number(t.price || 0).toLocaleString('vi-VN') %>đ</small>
+                </label>
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+
+        <div class='pd-group'>
+          <div class='pd-group__title'>Độ ngọt</div>
+          <div class='pd-options pd-options--level'>
+            <% ['0%', '25%', '50%', '75%', '100%'].forEach(function(level, index) { %>
+              <label class='pd-option'>
+                <input type='radio' name='sweetness' value='<%= level %>' <%= index === 2 ? 'checked' : '' %>>
+                <span><%= level %></span>
+                <small><%= index === 0 ? 'Không ngọt' : index === 2 ? 'Vừa' : 'Ngọt' %></small>
+              </label>
+            <% }); %>
+          </div>
+        </div>
+
+        <div class='pd-group'>
+          <div class='pd-group__title'>Đá</div>
+          <div class='pd-options pd-options--level'>
+            <% ['0%', '25%', '50%', '75%', '100%'].forEach(function(level, index) { %>
+              <label class='pd-option'>
+                <input type='radio' name='ice' value='<%= level %>' <%= index === 2 ? 'checked' : '' %>>
+                <span><%= level %></span>
+                <small><%= index === 0 ? 'Không đá' : index === 2 ? 'Vừa đá' : 'Nhiều đá' %></small>
+              </label>
+            <% }); %>
+          </div>
+        </div>
+
+        <div class='pd-qty-row'>
+          <div>
+            <div class='pd-group__title'>Số lượng</div>
+            <div class='pd-qty'>
+              <button type='button' id='pdQtyMinus'>-</button>
+              <input type='number' id='pdQtyInput' value='1' min='1'>
+              <button type='button' id='pdQtyPlus'>+</button>
+            </div>
+          </div>
+          <div class='pd-total'>
+            <span>Total</span>
+            <strong id='pdTotalPrice'><%= Number(data.base_price || 0).toLocaleString('vi-VN') %>đ</strong>
+          </div>
+        </div>
+
+        <textarea class='pd-note' name='note' maxlength='120' placeholder='Thêm ghi chú cho món uống của bạn...'></textarea>
+
+        <div class='pd-actions'>
+          <button type='submit' class='pd-add'>Thêm vào giỏ hàng</button>
+          <button type='submit' class='pd-buy'>Mua ngay</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <% if (relatedList.length) { %>
+    <section class='pd-related'>
+      <div class='pd-section-head'>
+        <h2>Sản phẩm liên quan</h2>
+      </div>
+      <div class='pd-related-scroll' aria-label='Sản phẩm liên quan'>
+        <% relatedList.forEach(function(p) { %>
+          <article class='pd-related-card'>
+            <a href='/products/<%= p.id %>'>
+              <% if (p.image_url) { %>
+                <img src='<%= p.image_url %>' alt='<%= p.name %>' onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                <span>No image</span>
+              <% } else { %>
+                <span>No image</span>
+              <% } %>
+            </a>
+            <h3><%= p.name %></h3>
+            <strong><%= Number(p.base_price || 0).toLocaleString('vi-VN') %>đ</strong>
+          </article>
+        <% }); %>
+      </div>
+    </section>
+  <% } %>
+
+  <section class='pd-reviews'>
+    <div class='pd-section-head'>
+      <h2>Đánh giá của khách hàng</h2>
+    </div>
+    <div class='pd-review-layout'>
+      <div class='pd-review-score'>
+        <strong><%= ratingText %></strong>
+        <span><%= reviewCount ? ratingStars(averageRating) : '☆☆☆☆☆' %></span>
+        <small>(<%= reviewCount %> đánh giá)</small>
+        <a href='/orders'>Đánh giá từ đơn đã mua</a>
+      </div>
+      <% if (reviewList.length) { %>
+        <% reviewList.slice(0, 6).forEach(function(review) { %>
+          <article class='pd-review-card'>
+            <strong><%= review.reviewer_name || 'Khách hàng Brew Haven' %></strong>
+            <span><%= ratingStars(review.rating) %></span>
+            <small><%= review.updated_at ? new Date(review.updated_at).toLocaleDateString('vi-VN') : '' %></small>
+            <p><%= review.comment || 'Khách hàng đã đánh giá món này.' %></p>
+          </article>
+        <% }) %>
+      <% } else { %>
+        <article class='pd-review-card pd-review-card--empty'>
+          <strong>Chưa có đánh giá</strong>
+          <span>☆☆☆☆☆</span>
+          <p>Sản phẩm này chưa có đánh giá từ khách đã mua. Sau khi đơn hoàn tất, bạn có thể đánh giá món trong trang Theo dõi đơn hàng.</p>
+        </article>
+      <% } %>
+    </div>
+  </section>
+<% } %>
+
+<script>
+  (function() {
+    var baseEl = document.getElementById('pdBasePrice');
+    var basePrice = Number(baseEl ? baseEl.getAttribute('data-value') : 0);
+    var qtyInput = document.getElementById('pdQtyInput');
+    var qtyHidden = document.getElementById('pdQuantityHidden');
+    var totalEl = document.getElementById('pdTotalPrice');
+    var sizeHidden = document.getElementById('pdSizeHidden');
+    var toppingsHidden = document.getElementById('pdToppingsHidden');
+
+    function formatPrice(value) {
+      return Number(value || 0).toLocaleString('vi-VN') + 'đ';
+    }
+
+    function selectedUnitPrice() {
+      var selected = document.querySelector('input[name="size"]:checked');
+      var sizePrice = selected ? Number(selected.getAttribute('data-price') || 0) : 0;
+      return sizePrice > 0 ? sizePrice : basePrice;
+    }
+
+    function selectedToppingPrice() {
+      var sum = 0;
+      document.querySelectorAll('input[name="topping_choice"]:checked').forEach(function(input) {
+        sum += Number(input.getAttribute('data-price') || 0);
+      });
+      return sum;
+    }
+
+    function syncHidden() {
+      var selectedSize = document.querySelector('input[name="size"]:checked');
+      if (sizeHidden && selectedSize) sizeHidden.value = selectedSize.value;
+
+      var selectedToppings = [];
+      document.querySelectorAll('input[name="topping_choice"]:checked').forEach(function(input) {
+        selectedToppings.push(input.value);
+      });
+      if (toppingsHidden) toppingsHidden.value = selectedToppings.join(',');
+    }
+
+    function recalc() {
+      var qty = Math.max(1, Number(qtyInput ? qtyInput.value : 1) || 1);
+      var unitPrice = selectedUnitPrice() + selectedToppingPrice();
+      if (qtyInput) qtyInput.value = qty;
+      if (qtyHidden) qtyHidden.value = qty;
+      if (baseEl) baseEl.textContent = formatPrice(unitPrice);
+      if (totalEl) totalEl.textContent = formatPrice(unitPrice * qty);
+      syncHidden();
+    }
+
+    var minus = document.getElementById('pdQtyMinus');
+    var plus = document.getElementById('pdQtyPlus');
+    if (minus) minus.addEventListener('click', function() {
+      qtyInput.value = Math.max(1, Number(qtyInput.value || 1) - 1);
+      recalc();
+    });
+    if (plus) plus.addEventListener('click', function() {
+      qtyInput.value = Number(qtyInput.value || 1) + 1;
+      recalc();
+    });
+
+    document.querySelectorAll('.pd-form input').forEach(function(input) {
+      input.addEventListener('change', recalc);
+      input.addEventListener('input', recalc);
+    });
+
+    document.querySelectorAll('input[name="topping_choice"]').forEach(function(input) {
+      input.addEventListener('change', function() {
+        var checked = document.querySelectorAll('input[name="topping_choice"]:checked');
+        if (checked.length > 2) {
+          input.checked = false;
+        }
+        recalc();
+      });
+    });
+
+    document.querySelectorAll('.pd-related-scroll').forEach(function(scroller) {
+      scroller.addEventListener('wheel', function(event) {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        event.preventDefault();
+        scroller.scrollLeft += event.deltaY;
+      }, { passive: false });
+    });
+
+    recalc();
+  })();
+</script>

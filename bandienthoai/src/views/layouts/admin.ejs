@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title><%= typeof title !== 'undefined' ? title : 'Admin' %> | Brew Haven</title>
+  <link rel='stylesheet' href='/css/admin.css'>
+</head>
+<body class='admin-body'>
+  <div class='admin-shell'>
+    <aside class='admin-sidebar'>
+      <a class='admin-brand' href='/admin'>
+        <span class='admin-brand__mark'>BH</span>
+        <span>
+          <strong>Brew Haven</strong>
+          <small>Coffee & More</small>
+        </span>
+      </a>
+
+      <% const navItems = [
+        { href: '/admin', label: 'Dashboard', icon: 'H' },
+        { href: '/admin/products', label: 'Sản phẩm', icon: 'P' },
+        { href: '/admin/categories', label: 'Danh mục', icon: 'C' },
+        { href: '/admin/orders', label: 'Đơn hàng', icon: 'O' },
+        { href: '/admin/reservations', label: 'Đặt bàn', icon: 'B' },
+        { href: '/admin/users', label: 'Khách hàng', icon: 'U' },
+        { href: '/admin/promotions', label: 'Khuyến mãi', icon: '%' },
+        { href: '/admin/statistics', label: 'Báo cáo', icon: 'R' }
+      ]; %>
+
+      <nav class='admin-nav' aria-label='Admin navigation'>
+        <% navItems.forEach(function(item) { %>
+          <% const active = currentPath === item.href || (item.href !== '/admin' && currentPath.startsWith(item.href)); %>
+          <a class='<%= active ? "is-active" : "" %>' href='<%= item.href %>'>
+            <span aria-hidden='true'><%= item.icon %></span>
+            <%= item.label %>
+          </a>
+        <% }) %>
+      </nav>
+    </aside>
+
+    <div class='admin-main'>
+      <header class='admin-topbar'>
+        <form class='admin-search' action='/admin/products' method='get'>
+          <input type='search' name='q' placeholder='Tìm kiếm đơn hàng, khách hàng, sản phẩm...'>
+          <button type='submit' aria-label='Tìm kiếm'>Q</button>
+        </form>
+
+        <div class='admin-account'>
+          <span class='admin-bell' aria-hidden='true'>!</span>
+          <a class='admin-profile-link' href='/admin/profile' aria-label='Hồ sơ admin'>
+            <span class='admin-avatar'><%= (currentUser?.full_name || 'A').charAt(0).toUpperCase() %></span>
+            <span>
+              <strong><%= currentUser?.full_name || 'Admin' %></strong>
+              <small>Quản trị viên</small>
+            </span>
+          </a>
+        </div>
+      </header>
+
+      <main class='admin-content'>
+        <%- body %>
+      </main>
+
+      <footer class='admin-footer'>
+        <span>© 2026 Brew Haven</span>
+        <span>Phiên bản 1.0.0</span>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

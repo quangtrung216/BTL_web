@@ -1,0 +1,227 @@
+/* Brew Haven motion polish */
+@keyframes brewFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes brewSoftReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes brewSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+body.menu-page .page__content,
+body.cart-page .page__content,
+body.product-detail-page .page__content,
+body.home-page .page__content,
+body.login-page .page__content,
+body.register-page .page__content,
+body.profile-page .page__content {
+  animation: brewSoftReveal 420ms ease both;
+}
+
+.menu-hero,
+.cart-hero,
+.pd-shell,
+.home-hero,
+.profile-hero,
+.login-shell,
+.register-shell {
+  animation: brewFadeUp 520ms ease both;
+}
+
+.menu-card,
+.cart-card,
+.home-product,
+.pd-related-card,
+.profile-card,
+.cart-summary,
+.summary,
+.product-card {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.menu-card:hover,
+.cart-card:hover,
+.home-product:hover,
+.pd-related-card:hover,
+.profile-card:hover,
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(60, 38, 24, 0.12);
+}
+
+.cart-summary:hover,
+.summary:hover {
+  box-shadow: 0 14px 30px rgba(60, 38, 24, 0.11);
+}
+
+.menu-card__media img,
+.cart-card__media img,
+.home-product__image img,
+.pd-media img,
+.pd-related-card img,
+.product-image img {
+  transition: transform 420ms ease, filter 420ms ease;
+}
+
+.menu-card:hover .menu-card__media img,
+.cart-card:hover .cart-card__media img,
+.home-product:hover .home-product__image img,
+.pd-media:hover img,
+.pd-related-card:hover img,
+.product-card:hover .product-image img {
+  transform: scale(1.035);
+  filter: saturate(1.05);
+}
+
+.menu-tabs a,
+.cart-hero__link,
+.cart-checkout,
+.cart-back,
+.cart-qty button,
+.cart-remove,
+.menu-card__actions button,
+.menu-card__actions > a,
+.pd-add,
+.pd-buy,
+.account-link,
+.btn,
+body.menu-page button,
+body.cart-page button,
+body.product-detail-page button,
+body.home-page button,
+body.login-page button,
+body.register-page button,
+body.profile-page button {
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.menu-tabs a:hover,
+.cart-hero__link:hover,
+.cart-checkout:hover,
+.cart-back:hover,
+.cart-qty button:hover,
+.cart-remove:hover,
+.menu-card__actions button:hover,
+.menu-card__actions > a:hover,
+.pd-add:hover,
+.pd-buy:hover,
+.account-link:hover,
+.btn:hover,
+body.menu-page button:hover,
+body.cart-page button:hover,
+body.product-detail-page button:hover,
+body.home-page button:hover,
+body.login-page button:hover,
+body.register-page button:hover,
+body.profile-page button:hover {
+  transform: translateY(-1px);
+}
+
+.menu-tabs a:active,
+.cart-hero__link:active,
+.cart-checkout:active,
+.cart-back:active,
+.cart-qty button:active,
+.cart-remove:active,
+.menu-card__actions button:active,
+.menu-card__actions > a:active,
+.pd-add:active,
+.pd-buy:active,
+.account-link:active,
+.btn:active,
+body.menu-page button:active,
+body.cart-page button:active,
+body.product-detail-page button:active,
+body.home-page button:active,
+body.login-page button:active,
+body.register-page button:active,
+body.profile-page button:active {
+  transform: translateY(0);
+}
+
+.cart-card:nth-of-type(1),
+.menu-card:nth-of-type(1),
+.home-product:nth-of-type(1) {
+  animation: brewFadeUp 420ms ease both;
+}
+
+.cart-card:nth-of-type(2),
+.menu-card:nth-of-type(2),
+.home-product:nth-of-type(2) {
+  animation: brewFadeUp 480ms ease both;
+}
+
+.cart-card:nth-of-type(3),
+.menu-card:nth-of-type(3),
+.home-product:nth-of-type(3) {
+  animation: brewFadeUp 540ms ease both;
+}
+
+.cart-card:nth-of-type(n + 4),
+.menu-card:nth-of-type(n + 4),
+.home-product:nth-of-type(n + 4) {
+  animation: brewFadeUp 600ms ease both;
+}
+
+.cart-summary {
+  animation: brewSlideIn 560ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+* { box-sizing: border-box; }
+
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+

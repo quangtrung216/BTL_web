@@ -1,0 +1,79 @@
+<%
+  const promotions = Array.isArray(items) ? items : [];
+  const formatDate = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : 'Đang áp dụng';
+  };
+  const discountLabel = function(promo) {
+    if (promo.discount_type === 'percentage') return `${promo.discount_value || 0}%`;
+    if (promo.discount_type === 'fixed') return `${Number(promo.discount_value || 0).toLocaleString('vi-VN')}đ`;
+    return 'Ưu đãi';
+  };
+%>
+
+<section class='promo-hero action-hero'>
+  <div class='action-hero__copy'>
+    <span class='action-eyebrow'>Brew Haven Offers</span>
+    <h1>Ưu đãi hôm nay</h1>
+    <p>Chọn deal phù hợp cho buổi cà phê, trà sữa hoặc bánh ngọt của bạn. Các ưu đãi được cập nhật theo từng mùa.</p>
+    <div class='action-hero__actions'>
+      <a href='#current-promotions'>Xem khuyến mãi</a>
+      <a href='/products'>Mở menu</a>
+    </div>
+  </div>
+  <div class='action-hero__media'>
+    <img src='/images/products/tra-dao-cam-sa.jpg' alt='Brew Haven promotion'>
+  </div>
+</section>
+
+<section class='action-section' id='current-promotions'>
+  <div class='action-section__head'>
+    <div>
+      <span class='action-eyebrow'>Current Deals</span>
+      <h2>Khuyến mãi đang chạy</h2>
+    </div>
+    <a href='/products'>Đặt món ngay</a>
+  </div>
+
+  <% if (!promotions.length) { %>
+    <div class='action-empty'>
+      <h3>Chưa có khuyến mãi mới</h3>
+      <p>Bạn vẫn có thể khám phá menu Brew Haven và quay lại trang này sau.</p>
+      <a href='/products'>Xem menu</a>
+    </div>
+  <% } else { %>
+    <div class='promo-grid'>
+      <% promotions.forEach(function(promo, index) { %>
+        <article class='promo-card'>
+          <div class='promo-card__media'>
+            <img src='<%= promo.image_url || ["/images/products/cf-sua-da.jpg", "/images/products/matcha.jpg", "/images/products/banh-tiramisu.jpg"][index % 3] %>' alt='<%= promo.title || promo.name || "Khuyến mãi" %>'>
+            <span><%= discountLabel(promo) %></span>
+          </div>
+          <div class='promo-card__body'>
+            <h3><%= promo.title || promo.name || 'Khuyến mãi Brew Haven' %></h3>
+            <p><%= promo.description || 'Ưu đãi dành cho các món được yêu thích tại Brew Haven.' %></p>
+            <div class='promo-card__meta'>
+              <span>Hiệu lực đến</span>
+              <strong><%= formatDate(promo.end_date) %></strong>
+            </div>
+            <a href='/products'>Dùng ưu đãi</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<section class='offer-strip'>
+  <article>
+    <strong>Happy Hour</strong>
+    <span>Giảm giá đồ uống từ 14:00 đến 17:00 mỗi ngày.</span>
+  </article>
+  <article>
+    <strong>Combo nhóm</strong>
+    <span>Ưu đãi cho nhóm từ 5 người khi đặt bàn trước.</span>
+  </article>
+  <article>
+    <strong>Birthday Treat</strong>
+    <span>Nhận món đặc biệt trong tháng sinh nhật.</span>
+  </article>
+</section>

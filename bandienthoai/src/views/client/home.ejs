@@ -1,0 +1,124 @@
+<%
+  const categoryItems = [
+    { name: 'Coffee', image: '/images/products/cf-sua-da.jpg' },
+    { name: 'Milk Tea', image: '/images/products/tra-sua-truyen-thong.jpg' },
+    { name: 'Fruit Tea', image: '/images/products/tra-dao-cam-sa.jpg' },
+    { name: 'Blended', image: '/images/products/cookies-da-xay.jpg' },
+    { name: 'Cakes', image: '/images/products/banh-tiramisu.jpg' }
+  ];
+
+  const displayProducts = featuredProducts && featuredProducts.length > 0 ? featuredProducts.slice(0, 4) : [];
+%>
+
+<div class='brew-home'>
+  <section class='home-hero'>
+    <div class='home-hero__copy'>
+      <p class='home-eyebrow'>Good coffee, good day</p>
+      <h1>Every Cup Made for You</h1>
+      <p>Handcrafted drinks, cozy vibes, and moments that make life better. Welcome to Brew Haven.</p>
+      <div class='home-hero__actions'>
+        <a href='/products' class='home-btn home-btn--primary'>
+          <img class='home-btn__icon' src='/icon/orders-icon.svg' alt='' aria-hidden='true'>
+          Order Now
+        </a>
+        <a href='/contact' class='home-btn home-btn--ghost'>
+          <img class='home-btn__icon' src='/icon/mobile-online-booking-icon.svg' alt='' aria-hidden='true'>
+          Book a Table
+        </a>
+      </div>
+      <div class='home-features' aria-label='Brew Haven highlights'>
+        <div><span>*</span><strong>Premium<br>Ingredients</strong></div>
+        <div><span>*</span><strong>Skilled<br>Baristas</strong></div>
+        <div><span>*</span><strong>Cozy<br>Atmosphere</strong></div>
+      </div>
+    </div>
+    <div class='home-hero__media'>
+      <img class='home-hero__logo' src='/images/logo/logo2.jpg' alt='Brew Haven logo' onerror="this.style.display='none';">
+    </div>
+  </section>
+
+  <section class='home-section home-section--tight'>
+    <h2>Explore Our Categories</h2>
+    <div class='home-categories'>
+      <% categoryItems.forEach(function(category) { %>
+        <a href='/products' class='home-category'>
+          <span class='home-category__image'>
+            <img src='<%= category.image %>' alt='<%= category.name %>' onerror="this.style.display='none';">
+          </span>
+          <strong><%= category.name %></strong>
+        </a>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class='home-section'>
+    <div class='home-section__head'>
+      <h2>Best Sellers</h2>
+      <a href='/products'>View All <span aria-hidden='true'>-&gt;</span></a>
+    </div>
+    <div class='home-best'>
+      <div class='home-products'>
+        <% if (displayProducts.length) { %>
+          <% displayProducts.forEach(function(p) { %>
+            <article class='home-product'>
+              <a href='/products/<%= p.id %>' class='home-product__image'>
+                <% if (p.image_url) { %>
+                  <img src='<%= p.image_url %>' alt='<%= p.name %>' onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                  <span class='home-image-placeholder'>No image</span>
+                <% } else { %>
+                  <span class='home-image-placeholder'>No image</span>
+                <% } %>
+              </a>
+              <button class='home-product__heart' type='button' aria-label='Save <%= p.name %>'>♡</button>
+              <div class='home-product__body'>
+                <h3><%= p.name %></h3>
+                <p><%= p.description ? String(p.description).substring(0, 68) : 'Freshly prepared Brew Haven favourite.' %></p>
+                <div class='home-product__row'>
+                  <strong><%= Number(p.base_price || 0).toLocaleString('vi-VN') %>d</strong>
+                  <form action='/cart/add' method='POST'>
+                    <input type='hidden' name='product_id' value='<%= p.id %>'>
+                    <input type='hidden' name='quantity' value='1'>
+                    <button type='submit' aria-label='Add <%= p.name %> to cart'>+</button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        <% } else { %>
+          <div class='home-products-empty'>No products found.</div>
+        <% } %>
+      </div>
+
+      <aside class='home-promo'>
+        <span>HOT PROMO</span>
+        <div>
+          <h3>Summer Refresh<br>Up to 20% OFF</h3>
+          <p>Enjoy selected drinks and cakes this season.</p>
+          <a href='/promotions'>Order Now</a>
+        </div>
+        <img src='/images/logo/logo3.jpg' alt='Summer refresh promotion' onerror="this.style.display='none';">
+      </aside>
+    </div>
+  </section>
+
+  <section class='home-section home-section--reviews'>
+    <h2>What Our Customers Say</h2>
+    <div class='home-reviews'>
+      <% if (testimonials && testimonials.length > 0) { %>
+        <% testimonials.forEach(function(t) { %>
+          <article class='home-review'>
+            <p>"<%= t.message %>"</p>
+            <div>
+              <span class='home-review__avatar'><%= t.name.charAt(0).toUpperCase() %></span>
+              <div>
+                <strong><%= t.name %></strong>
+                <span>*****</span>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      <% } %>
+    </div>
+    <div class='home-dots' aria-hidden='true'><span></span><span></span><span></span></div>
+  </section>
+</div>

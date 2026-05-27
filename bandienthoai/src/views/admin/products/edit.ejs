@@ -1,0 +1,98 @@
+<% const product = item || {}; %>
+<% const currentStatus = product.status || 'available'; %>
+
+<section class='admin-product-editor'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Sửa sản phẩm</h1>
+      <p>Cập nhật thông tin bán hàng, tồn kho và trạng thái hiển thị.</p>
+    </div>
+    <a class='admin-table-link' href='/admin/products'>Quay lại danh sách</a>
+  </div>
+
+  <form class='admin-product-form' method='post' action=''>
+    <aside class='admin-product-preview'>
+      <div class='admin-product-preview__media'>
+        <% if (product.image_url) { %>
+          <img src='<%= product.image_url %>' alt='<%= product.name || "Sản phẩm" %>'>
+        <% } else { %>
+          <span>SP</span>
+        <% } %>
+      </div>
+      <div>
+        <h2><%= product.name || 'Sản phẩm chưa đặt tên' %></h2>
+        <p><%= product.description || 'Chưa có mô tả sản phẩm.' %></p>
+      </div>
+      <dl>
+        <div>
+          <dt>Mã sản phẩm</dt>
+          <dd>#<%= product.id || '-' %></dd>
+        </div>
+        <div>
+          <dt>Tồn kho hiện tại</dt>
+          <dd><%= Number(product.stock_quantity || 0).toLocaleString('vi-VN') %></dd>
+        </div>
+        <div>
+          <dt>Trạng thái</dt>
+          <dd><%= currentStatus === 'available' ? 'Đang bán' : currentStatus === 'out_of_stock' ? 'Hết hàng' : 'Đã ẩn' %></dd>
+        </div>
+      </dl>
+    </aside>
+
+    <div class='admin-product-form-card'>
+      <div class='admin-form-section'>
+        <h2>Thông tin cơ bản</h2>
+        <div class='admin-form-grid'>
+          <label>
+            <span>Tên sản phẩm</span>
+            <input type='text' name='name' value='<%= product.name || "" %>' required>
+          </label>
+
+          <label>
+            <span>Danh mục</span>
+            <input type='number' name='category_id' value='<%= product.category_id || "" %>' min='1' required>
+          </label>
+
+          <label class='is-wide'>
+            <span>Mô tả</span>
+            <textarea name='description'><%= product.description || "" %></textarea>
+          </label>
+        </div>
+      </div>
+
+      <div class='admin-form-section'>
+        <h2>Bán hàng và tồn kho</h2>
+        <div class='admin-form-grid'>
+          <label>
+            <span>Giá bán</span>
+            <input type='number' step='1000' min='0' name='base_price' value='<%= Number(product.base_price || 0) %>' required>
+          </label>
+
+          <label>
+            <span>Số lượng tồn</span>
+            <input type='number' min='0' name='stock_quantity' value='<%= product.stock_quantity || 0 %>' required>
+          </label>
+
+          <label>
+            <span>Trạng thái</span>
+            <select name='status'>
+              <option value='available' <%= currentStatus === 'available' ? 'selected' : '' %>>Đang bán</option>
+              <option value='out_of_stock' <%= currentStatus === 'out_of_stock' ? 'selected' : '' %>>Hết hàng</option>
+              <option value='hidden' <%= currentStatus === 'hidden' ? 'selected' : '' %>>Ẩn khỏi cửa hàng</option>
+            </select>
+          </label>
+
+          <label class='is-wide'>
+            <span>Đường dẫn ảnh</span>
+            <input type='text' name='image_url' value='<%= product.image_url || "" %>' placeholder='/images/products/example.jpg'>
+          </label>
+        </div>
+      </div>
+
+      <div class='admin-product-form-actions'>
+        <a class='admin-table-link' href='/admin/products'>Hủy</a>
+        <button type='submit'>Lưu thay đổi</button>
+      </div>
+    </div>
+  </form>
+</section>

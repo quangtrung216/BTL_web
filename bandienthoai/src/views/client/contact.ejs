@@ -1,0 +1,219 @@
+<%
+  const user = typeof currentUser !== 'undefined' && currentUser ? currentUser : {};
+  const isCustomer = user.role === 'customer';
+  const reservationRows = Array.isArray(reservations) ? reservations : [];
+  const reservationStatusMap = {
+    pending: 'Chờ duyệt',
+    confirmed: 'Đã xác nhận',
+    completed: 'Hoàn tất',
+    cancelled: 'Đã hủy'
+  };
+  const formatDate = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+  };
+  const formatTime = function(value) {
+    return value ? String(value).slice(0, 5) : '-';
+  };
+%>
+
+<section class='reservation-page'>
+  <div class='action-hero reservation-hero'>
+    <div class='action-hero__copy'>
+      <span class='action-eyebrow'>Reservation</span>
+      <h1>Đặt bàn tại Brew Haven</h1>
+      <p>Giữ chỗ trước cho buổi gặp gỡ, làm việc hoặc một tối cà phê nhẹ nhàng. Chúng tôi sẽ liên hệ xác nhận sau khi nhận yêu cầu.</p>
+      <div class='reservation-highlights'>
+        <span>07:00 - 22:00</span>
+        <span>Không gian yên tĩnh</span>
+        <span>Nhóm nhỏ và workshop</span>
+      </div>
+    </div>
+    <div class='action-hero__media'>
+      <img src='/images/products/cf-sua-da.jpg' alt='Brew Haven reservation'>
+    </div>
+  </div>
+
+  <% if (isCustomer) { %>
+  <div class='reservation-layout'>
+    <form class='reservation-form' method='post' action='/reservation'>
+      <div class='action-section__head'>
+        <div>
+          <span class='action-eyebrow'>Book a Table</span>
+          <h2>Thông tin đặt bàn</h2>
+        </div>
+      </div>
+
+      <div class='reservation-grid'>
+        <input id='reservationBranchInput' type='hidden' name='branch' value='hung-yen'>
+        <label>
+          <span>Họ tên</span>
+          <input type='text' name='name' value='<%= user.full_name || "" %>' placeholder='Nguyễn Văn A' required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type='email' name='email' value='<%= user.email || "" %>' placeholder='you@example.com' required>
+        </label>
+        <label>
+          <span>Số điện thoại</span>
+          <input type='text' name='phone' value='<%= user.phone || "" %>' placeholder='0901 234 567' required>
+        </label>
+        <label>
+          <span>Số khách</span>
+          <input type='number' name='party_size' min='1' max='20' placeholder='4' required>
+        </label>
+        <label>
+          <span>Ngày</span>
+          <input type='date' name='reservation_date' required>
+        </label>
+        <label>
+          <span>Giờ</span>
+          <input type='time' name='reservation_time' required>
+        </label>
+        <label class='is-wide'>
+          <span>Ghi chú</span>
+          <textarea name='message' placeholder='Ví dụ: cần bàn gần cửa sổ, có ổ cắm, sinh nhật...'></textarea>
+        </label>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <p class='reservation-message reservation-message--error'><%= error %></p>
+      <% } %>
+
+      <button type='submit'>Gửi yêu cầu đặt bàn</button>
+    </form>
+
+    <aside class='reservation-info'>
+      <h2>Thông tin quán</h2>
+      <label class='reservation-branch-picker'>
+        <span>Cơ sở Brew Haven</span>
+        <select id='reservationBranchSelect'>
+          <option value='hung-yen'>Brew Haven Hưng Yên</option>
+          <option value='ha-noi'>Brew Haven Hà Nội</option>
+          <option value='hai-phong'>Brew Haven Hải Phòng</option>
+        </select>
+      </label>
+      <dl>
+        <div>
+          <dt>Địa chỉ</dt>
+          <dd id='reservationBranchAddress'>Khoái Châu, Tỉnh Hưng Yên</dd>
+        </div>
+        <div>
+          <dt>Hotline</dt>
+          <dd id='reservationBranchHotline'>0903 123 4567</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd id='reservationBranchEmail'>hungyen@brewhaven.vn</dd>
+        </div>
+      </dl>
+      <a href='/products'>Xem menu trước</a>
+    </aside>
+  </div>
+
+  <% if (reservationRows.length) { %>
+    <section class='reservation-history action-section'>
+      <div class='action-section__head'>
+        <div>
+          <span class='action-eyebrow'>My Reservations</span>
+          <h2>Lịch đặt bàn của bạn</h2>
+        </div>
+      </div>
+
+      <div class='reservation-history__grid'>
+        <% reservationRows.slice(0, 6).forEach(function(reservation) { %>
+          <article class='reservation-history-card'>
+            <div class='reservation-history-card__head'>
+              <strong><%= reservation.reservation_code || '#' + reservation.id %></strong>
+              <span class='reservation-status is-<%= reservation.status || "pending" %>'>
+                <%= reservationStatusMap[reservation.status] || reservation.status || 'Chờ duyệt' %>
+              </span>
+            </div>
+            <dl>
+              <div>
+                <dt>Ngày giờ</dt>
+                <dd><%= formatDate(reservation.reservation_date) %> lúc <%= formatTime(reservation.reservation_time) %></dd>
+              </div>
+              <div>
+                <dt>Số khách</dt>
+                <dd><%= Number(reservation.guest_count || 0).toLocaleString('vi-VN') %> khách</dd>
+              </div>
+              <div>
+                <dt>Bàn được gán</dt>
+                <dd><%= reservation.table_name || 'Bàn #' + (reservation.table_id || '-') %> <%= reservation.table_capacity ? '(' + reservation.table_capacity + ' chỗ)' : '' %></dd>
+              </div>
+              <% if (reservation.note) { %>
+                <div>
+                  <dt>Thông tin thêm</dt>
+                  <dd><%= reservation.note %></dd>
+                </div>
+              <% } %>
+            </dl>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+  <% } else { %>
+    <div class='reservation-login'>
+      <div class='reservation-login__panel'>
+        <span class='action-eyebrow'>Login Required</span>
+        <% if (!user.id) { %>
+          <h2>Bạn cần đăng nhập để đặt bàn</h2>
+          <p>Vui lòng đăng nhập bằng tài khoản khách hàng để gửi yêu cầu đặt bàn tại Brew Haven.</p>
+          <div class='reservation-login__actions'>
+            <a href='/login'>Đăng nhập</a>
+            <a href='/register'>Tạo tài khoản</a>
+          </div>
+        <% } else { %>
+          <h2>Chỉ tài khoản khách hàng mới có thể đặt bàn</h2>
+          <p>Tài khoản hiện tại không phải khách hàng. Hãy đăng nhập bằng tài khoản khách hàng để tiếp tục đặt bàn.</p>
+          <div class='reservation-login__actions'>
+            <a href='/login'>Đăng nhập tài khoản khác</a>
+            <a href='/products'>Xem menu</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</section>
+
+<script>
+  (function() {
+    var branches = {
+      'hung-yen': {
+        address: 'Khoái Châu, Tỉnh Hưng Yên',
+        hotline: '0903 123 4567',
+        email: 'hungyen@brewhaven.vn'
+      },
+      'ha-noi': {
+        address: 'Hoàn Kiếm, Thành phố Hà Nội',
+        hotline: '0903 234 567',
+        email: 'hanoi@brewhaven.vn'
+      },
+      'hai-phong': {
+        address: 'Lê Chân, Thành phố Hải Phòng',
+        hotline: '0903 345 678',
+        email: 'haiphong@brewhaven.vn'
+      }
+    };
+
+    var branchSelect = document.getElementById('reservationBranchSelect');
+    var addressEl = document.getElementById('reservationBranchAddress');
+    var hotlineEl = document.getElementById('reservationBranchHotline');
+    var emailEl = document.getElementById('reservationBranchEmail');
+
+    function updateBranchInfo() {
+      var branch = branches[branchSelect ? branchSelect.value : 'hung-yen'] || branches['hung-yen'];
+      var branchInput = document.getElementById('reservationBranchInput');
+      if (addressEl) addressEl.textContent = branch.address;
+      if (hotlineEl) hotlineEl.textContent = branch.hotline;
+      if (emailEl) emailEl.textContent = branch.email;
+      if (branchInput && branchSelect) branchInput.value = branchSelect.value;
+    }
+
+    if (branchSelect) {
+      branchSelect.addEventListener('change', updateBranchInfo);
+      updateBranchInfo();
+    }
+  })();
+</script>

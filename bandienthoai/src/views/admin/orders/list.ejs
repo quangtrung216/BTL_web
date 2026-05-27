@@ -1,0 +1,111 @@
+<% const rows = Array.isArray(items) ? items : []; %>
+<%
+  const statusOptions = [
+    ['pending', 'Chờ xác nhận'],
+    ['confirmed', 'Đã xác nhận'],
+    ['preparing', 'Đang chuẩn bị'],
+    ['ready', 'Sẵn sàng'],
+    ['delivering', 'Đang giao'],
+    ['completed', 'Hoàn tất'],
+    ['cancelled', 'Đã hủy']
+  ];
+  const statusMap = {
+    pending: { label: 'Chờ xác nhận', className: 'is-warning' },
+    confirmed: { label: 'Đã xác nhận', className: 'is-info' },
+    preparing: { label: 'Đang chuẩn bị', className: 'is-warning' },
+    ready: { label: 'Sẵn sàng', className: 'is-info' },
+    delivering: { label: 'Đang giao', className: 'is-info' },
+    completed: { label: 'Hoàn tất', className: '' },
+    cancelled: { label: 'Đã hủy', className: 'is-danger' }
+  };
+  const paymentMap = {
+    cash: 'Tiền mặt',
+    bank_transfer: 'Chuyển khoản',
+    e_wallet: 'Ví điện tử'
+  };
+  const orderTypeMap = {
+    dine_in: 'Tại quán',
+    takeaway: 'Mang đi',
+    delivery: 'Giao hàng'
+  };
+  const money = function(value) {
+    return Number(value || 0).toLocaleString('vi-VN') + 'đ';
+  };
+  const date = function(value) {
+    return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+  };
+%>
+
+<div class='container admin-orders-page'>
+  <div class='admin-list-head'>
+    <div>
+      <h1>Quản lý đơn hàng</h1>
+      <p>Cập nhật trạng thái đơn để khách theo dõi tiến trình xử lý trên trang Order Tracking.</p>
+    </div>
+  </div>
+
+  <% if (!rows.length) { %>
+    <p>Chưa có dữ liệu đơn hàng.</p>
+  <% } else { %>
+    <div class='admin-table-wrap'>
+      <table class='admin-table admin-orders-table'>
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Bàn/Hình thức</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th>Cập nhật trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.forEach(function(row) { %>
+            <% const status = statusMap[row.status] || { label: row.status || 'Không rõ', className: 'is-muted' }; %>
+            <tr>
+              <td>
+                <strong><%= row.order_code || '#' + row.id %></strong>
+                <small class='admin-muted-text'>#<%= row.id %></small>
+              </td>
+              <td>
+                <strong><%= row.receiver_name || 'Khách hàng' %></strong>
+                <small class='admin-muted-text'><%= row.receiver_phone || '-' %></small>
+              </td>
+              <td>
+                <strong><%= row.order_type === 'dine_in' ? (row.receiver_address || 'Tại quán') : (orderTypeMap[row.order_type] || row.order_type || '-') %></strong>
+                <small class='admin-muted-text'><%= row.order_type === 'dine_in' ? 'Cần phục vụ tại bàn' : (orderTypeMap[row.order_type] || '-') %></small>
+              </td>
+              <td><%= date(row.created_at) %></td>
+              <td><strong><%= money(row.total_amount) %></strong></td>
+              <td><%= paymentMap[row.payment_method] || row.payment_method || '-' %></td>
+              <td><span class='status-pill <%= status.className %>'><%= status.label %></span></td>
+              <td>
+                <form class='admin-status-form' method='post' action='/admin/orders/<%= row.id %>/status'>
+                  <select name='status' aria-label='Cập nhật trạng thái <%= row.order_code || row.id %>'>
+                    <% statusOptions.forEach(function(option) { %>
+                      <option value='<%= option[0] %>' <%= row.status === option[0] ? 'selected' : '' %>><%= option[1] %></option>
+                    <% }) %>
+                  </select>
+                  <button type='submit'>Lưu</button>
+                </form>
+              </td>
+              <td>
+                <div class='admin-action-row'>
+                  <a class='admin-table-link' href='/admin/orders/<%= row.id %>'>Chi tiết</a>
+                  <% if (row.status !== 'cancelled' && row.status !== 'completed') { %>
+                    <form class='admin-inline-form' method='post' action='/admin/orders/<%= row.id %>/cancel' onsubmit="return confirm('Bạn muốn hủy đơn hàng này?')">
+                      <button class='admin-danger-button' type='submit'>Hủy</button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>

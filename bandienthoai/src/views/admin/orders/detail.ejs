@@ -1,0 +1,207 @@
+<%
+  const data = item || null;
+  const rows = Array.isArray(orderItems) ? orderItems : [];
+  const statusOptions = [
+    ['pending', 'Chờ xác nhận'],
+    ['confirmed', 'Đã xác nhận'],
+    ['preparing', 'Đang chuẩn bị'],
+    ['ready', 'Sẵn sàng'],
+    ['delivering', 'Đang giao'],
+    ['completed', 'Hoàn tất'],
+    ['cancelled', 'Đã hủy']
+  ];
+  const statusMap = {
+    pending: { label: 'Chờ xác nhận', className: 'is-warning' },
+    confirmed: { label: 'Đã xác nhận', className: 'is-info' },
+    preparing: { label: 'Đang chuẩn bị', className: 'is-warning' },
+    ready: { label: 'Sẵn sàng', className: 'is-info' },
+    delivering: { label: 'Đang giao', className: 'is-info' },
+    completed: { label: 'Hoàn tất', className: '' },
+    cancelled: { label: 'Đã hủy', className: 'is-danger' }
+  };
+  const paymentMap = {
+    cash: 'Tiền mặt',
+    bank_transfer: 'Chuyển khoản',
+    e_wallet: 'Ví điện tử'
+  };
+  const orderTypeMap = {
+    dine_in: 'Dùng tại quán',
+    takeaway: 'Mang đi',
+    delivery: 'Giao hàng'
+  };
+  const money = function(value) {
+    return Number(value || 0).toLocaleString('vi-VN') + 'đ';
+  };
+  const dateTime = function(value) {
+    return value ? new Date(value).toLocaleString('vi-VN') : '-';
+  };
+%>
+
+<div class='admin-order-detail'>
+  <% if (!data) { %>
+    <div class='container'>
+      <div class='admin-list-head'>
+        <div>
+          <h1>Không tìm thấy đơn hàng</h1>
+          <p>Đơn hàng này không tồn tại hoặc đã bị xóa.</p>
+        </div>
+        <a class='admin-link-button' href='/admin/orders'>Quay lại</a>
+      </div>
+    </div>
+  <% } else { %>
+    <% const status = statusMap[data.status] || { label: data.status || 'Không rõ', className: 'is-muted' }; %>
+    <div class='admin-list-head'>
+      <div>
+        <h1>Đơn hàng <%= data.order_code || '#' + data.id %></h1>
+        <p>Cập nhật trạng thái để đồng bộ tiến trình cho khách hàng.</p>
+      </div>
+      <a class='admin-link-button' href='/admin/orders'>Quay lại danh sách</a>
+    </div>
+
+    <div class='admin-order-grid'>
+      <section class='admin-order-card admin-order-status-card'>
+        <div class='panel-heading'>
+          <div>
+            <h2>Trạng thái đơn</h2>
+            <p>Trạng thái hiện tại: <span class='status-pill <%= status.className %>'><%= status.label %></span></p>
+          </div>
+        </div>
+
+        <form class='admin-order-status-update' method='post' action='/admin/orders/<%= data.id %>/status'>
+          <label>
+            <span>Chọn trạng thái mới</span>
+            <select name='status'>
+              <% statusOptions.forEach(function(option) { %>
+                <option value='<%= option[0] %>' <%= data.status === option[0] ? 'selected' : '' %>><%= option[1] %></option>
+              <% }) %>
+            </select>
+          </label>
+          <button type='submit'>Cập nhật trạng thái</button>
+        </form>
+
+        <% if (data.status !== 'cancelled' && data.status !== 'completed') { %>
+          <form method='post' action='/admin/orders/<%= data.id %>/cancel' onsubmit="return confirm('Bạn muốn hủy đơn hàng này?')">
+            <button class='admin-danger-button admin-order-cancel-button' type='submit'>Hủy đơn hàng</button>
+          </form>
+        <% } %>
+      </section>
+
+      <section class='admin-order-card'>
+        <div class='panel-heading'>
+          <h2>Thông tin khách</h2>
+        </div>
+        <dl class='admin-order-info'>
+          <div>
+            <dt>Người nhận</dt>
+            <dd><%= data.receiver_name || '-' %></dd>
+          </div>
+          <div>
+            <dt>Số điện thoại</dt>
+            <dd><%= data.receiver_phone || '-' %></dd>
+          </div>
+          <div>
+            <dt>Địa chỉ</dt>
+            <dd><%= data.order_type === 'dine_in' ? '-' : (data.receiver_address || '-') %></dd>
+          </div>
+          <% if (data.order_type === 'dine_in') { %>
+            <div>
+              <dt>Bàn phục vụ</dt>
+              <dd><%= data.receiver_address || 'Tại quán' %></dd>
+            </div>
+          <% } %>
+          <div>
+            <dt>Mục đích</dt>
+            <dd><%= data.order_type === 'dine_in' ? 'Phục vụ tại bàn và thanh toán tại quầy' : 'Xử lý đơn khách hàng' %></dd>
+          </div>
+          <div>
+            <dt>Hình thức</dt>
+            <dd><%= orderTypeMap[data.order_type] || data.order_type || '-' %></dd>
+          </div>
+          <div>
+            <dt>Thanh toán</dt>
+            <dd><%= paymentMap[data.payment_method] || data.payment_method || '-' %></dd>
+          </div>
+          <div>
+            <dt>Thời gian đặt</dt>
+            <dd><%= dateTime(data.created_at) %></dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+
+    <div class='admin-order-grid'>
+      <section class='admin-order-card admin-order-items-card'>
+        <div class='panel-heading'>
+          <h2>Món trong đơn</h2>
+        </div>
+        <% if (!rows.length) { %>
+          <p>Chưa có dữ liệu món trong đơn.</p>
+        <% } else { %>
+          <div class='admin-table-wrap'>
+            <table class='admin-table'>
+              <thead>
+                <tr>
+                  <th>Món</th>
+                  <th>Số lượng</th>
+                  <th>Đơn giá</th>
+                  <th>Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rows.forEach(function(orderItem) { %>
+                  <tr>
+                    <td>
+                      <div class='admin-product-cell'>
+                        <% if (orderItem.image_url) { %>
+                          <img src='<%= orderItem.image_url %>' alt='<%= orderItem.product_name || "Sản phẩm" %>'>
+                        <% } else { %>
+                          <span class='admin-product-thumb'>SP</span>
+                        <% } %>
+                        <div>
+                          <strong><%= orderItem.product_name || 'Sản phẩm #' + orderItem.product_id %></strong>
+                          <% if (orderItem.note) { %>
+                            <small><%= orderItem.note %></small>
+                          <% } %>
+                        </div>
+                      </div>
+                    </td>
+                    <td><%= Number(orderItem.quantity || 0).toLocaleString('vi-VN') %></td>
+                    <td><%= money(orderItem.unit_price) %></td>
+                    <td><strong><%= money(Number(orderItem.unit_price || 0) * Number(orderItem.quantity || 0)) %></strong></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </section>
+
+      <section class='admin-order-card'>
+        <div class='panel-heading'>
+          <h2>Chi phí</h2>
+        </div>
+        <dl class='admin-order-totals'>
+          <div>
+            <dt>Tạm tính</dt>
+            <dd><%= money(data.subtotal) %></dd>
+          </div>
+          <div>
+            <dt>Giảm giá</dt>
+            <dd>-<%= money(data.discount_amount) %></dd>
+          </div>
+          <div>
+            <dt>Phí giao hàng</dt>
+            <dd><%= money(data.shipping_fee) %></dd>
+          </div>
+          <div>
+            <dt>Tổng tiền</dt>
+            <dd><%= money(data.total_amount) %></dd>
+          </div>
+        </dl>
+        <% if (data.note) { %>
+          <p class='admin-order-note'><strong>Ghi chú:</strong> <%= data.note %></p>
+        <% } %>
+      </section>
+    </div>
+  <% } %>
+</div>

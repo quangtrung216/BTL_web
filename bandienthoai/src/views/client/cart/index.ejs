@@ -1,0 +1,387 @@
+<%
+  const rows = Array.isArray(items) ? items : [];
+  const totalQuantity = summary ? Number(summary.totalQuantity || 0) : 0;
+  const subtotal = summary ? Number(summary.totalAmount || 0) : 0;
+  const discount = summary ? Number(summary.discountAmount || 0) : 0;
+  const deliveryFee = 0;
+  const totalPayment = summary ? Number(summary.finalAmount || Math.max(0, subtotal - discount + deliveryFee)) : 0;
+  const rewardPoints = Math.max(1, Math.round(totalPayment / 10000));
+  const user = typeof currentUser !== 'undefined' && currentUser ? currentUser : {};
+  const activeTableOrder = typeof tableOrder !== 'undefined' && tableOrder ? tableOrder : null;
+  const appliedPromotion = summary && summary.promotion ? summary.promotion : null;
+  const promotionCode = summary ? String(summary.promotionCode || '') : '';
+  const promotionMessage = summary ? summary.promotionMessage : null;
+  const promotionError = summary ? summary.promotionError : null;
+  const userAddress = String(user.address || '');
+  const formatMoney = function(value) {
+    return Number(value || 0).toLocaleString('vi-VN') + '&#273;';
+  };
+%>
+
+<section class='cart-page-head'>
+  <h1><%= activeTableOrder ? 'Đặt món tại ' + activeTableOrder.label : 'Giỏ hàng của bạn' %> <span aria-hidden='true'>&#9904;</span></h1>
+  <p><%= activeTableOrder ? 'Chọn món và gửi đơn trực tiếp tới quầy phục vụ.' : 'Kiểm tra món đã chọn và hoàn tất đơn hàng của bạn.' %></p>
+</section>
+
+<% if (activeTableOrder) { %>
+  <section class='cart-table-banner'>
+    <strong><%= activeTableOrder.label %></strong>
+    <span>Đơn sau khi đặt sẽ xuất hiện trong trang admin để nhân viên chuẩn bị và thanh toán.</span>
+    <form method='post' action='/table/clear'>
+      <button type='submit'>Thoát đặt món tại bàn</button>
+    </form>
+  </section>
+<% } %>
+
+<% if (!rows.length) { %>
+  <section class='cart-empty'>
+    <span class='cart-empty__icon'>+</span>
+    <h2>Giỏ hàng đang trống</h2>
+    <p>Hãy chọn món từ menu Brew Haven trước khi đặt hàng.</p>
+    <a href='/products'>Xem menu</a>
+  </section>
+<% } else { %>
+  <div class='cart-checkout-layout'>
+    <section class='cart-panel cart-items-panel'>
+      <div class='cart-panel__head'>
+        <h2>Món trong giỏ</h2>
+        <span><%= totalQuantity %> món</span>
+      </div>
+
+      <div class='cart-items'>
+        <% rows.forEach(function(row) { %>
+          <%
+            const unitPrice = Number(row.unit_price || row.base_price || 0);
+            const quantity = Number(row.quantity || 1);
+            const lineTotal = unitPrice * quantity;
+            const nextQuantity = quantity + 1;
+            const previousQuantity = Math.max(1, quantity - 1);
+          %>
+          <article class='cart-item-card'>
+            <a class='cart-item-card__media' href='/products/<%= row.product_id %>'>
+              <% if (row.image_url) { %>
+                <img src='<%= row.image_url %>' alt='<%= row.name %>' onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                <span>Chưa có ảnh</span>
+              <% } else { %>
+                <span class='is-visible'>Chưa có ảnh</span>
+              <% } %>
+            </a>
+
+            <div class='cart-item-card__info'>
+              <div class='cart-item-card__name-row'>
+                <h2><a href='/products/<%= row.product_id %>'><%= row.name %></a></h2>
+                <% if (row.product_id && Number(row.product_id) % 2 === 0) { %>
+                  <span class='cart-badge'>Phổ biến</span>
+                <% } %>
+              </div>
+              <p><strong>Kích cỡ:</strong> <%= row.size_name || 'Tiêu chuẩn' %></p>
+              <p><strong>Topping:</strong> <%= row.topping_names || 'Không có topping' %></p>
+              <p><strong>Độ ngọt:</strong> <%= row.sweetness || '50%' %> &nbsp; <strong>Đá:</strong> <%= row.ice || '50%' %></p>
+              <p><strong>Ghi chú:</strong> <%= row.note || 'Không có ghi chú' %></p>
+            </div>
+
+            <div class='cart-item-card__controls'>
+              <form class='cart-qty' method='post' action='/cart/update/<%= row.id %>'>
+                <button type='submit' name='quantity' value='<%= previousQuantity %>' aria-label='Giảm số lượng'>-</button>
+                <input type='text' value='<%= quantity %>' aria-label='Số lượng' readonly>
+                <button type='submit' name='quantity' value='<%= nextQuantity %>' aria-label='Tăng số lượng'>+</button>
+              </form>
+              <strong><%- formatMoney(lineTotal) %></strong>
+              <form method='post' action='/cart/remove/<%= row.id %>'>
+                <button class='cart-remove' type='submit' aria-label='Xóa món'>&#128465;</button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+
+      <a class='cart-add-more' href='/products'><span>+</span> Thêm món</a>
+    </section>
+
+    <aside class='cart-panel cart-summary-panel'>
+      <h2>Tóm tắt đơn hàng</h2>
+      <div class='cart-summary-lines'>
+        <div><span>Tạm tính (<%= totalQuantity %> món)</span><strong><%- formatMoney(subtotal) %></strong></div>
+        <div><span>Giảm giá</span><strong class='is-green'><%- discount ? '-' + formatMoney(discount) : formatMoney(0) %></strong></div>
+        <div><span>Phí giao hàng</span><strong><%- deliveryFee ? formatMoney(deliveryFee) : 'Miễn phí' %></strong></div>
+      </div>
+      <div class='cart-total-row'>
+        <span>Tổng thanh toán</span>
+        <strong><%- formatMoney(totalPayment) %></strong>
+      </div>
+      <div class='cart-discount'>
+        <label for='cartDiscountCode'>Mã giảm giá</label>
+        <form method='post' action='/cart/promotion/apply'>
+          <input id='cartDiscountCode' name='promotion_code' type='text' value='<%= promotionCode %>' placeholder='Nhập mã'>
+          <button type='submit'>Áp dụng</button>
+        </form>
+        <% if (promotionMessage) { %>
+          <p class='cart-discount__message is-success'><%= promotionMessage %></p>
+        <% } %>
+        <% if (promotionError) { %>
+          <p class='cart-discount__message is-error'><%= promotionError %></p>
+        <% } %>
+        <% if (appliedPromotion) { %>
+          <form class='cart-discount__remove' method='post' action='/cart/promotion/remove'>
+            <button type='submit'>Bỏ mã <%= appliedPromotion.code %></button>
+          </form>
+        <% } %>
+      </div>
+      <p class='cart-points'>&#9881; Bạn sẽ nhận <%= rewardPoints %> điểm Brew Points cho đơn hàng này!</p>
+    </aside>
+  </div>
+
+  <form class='cart-order-form' method='post' action='/checkout'>
+    <% if (appliedPromotion) { %>
+      <input type='hidden' name='promotion_code' value='<%= appliedPromotion.code %>'>
+    <% } %>
+    <% if (activeTableOrder) { %>
+      <input type='hidden' name='order_type' value='dine-in'>
+      <input type='hidden' name='payment_method' value='COD'>
+      <section class='cart-panel cart-details-panel'>
+        <div class='cart-section-title'>
+          <h2>Thông tin đơn tại bàn</h2>
+          <p>Nhân viên sẽ nhận đơn theo đúng mã bàn QR bạn đã quét.</p>
+        </div>
+        <div class='cart-field-grid'>
+          <label>
+            <span>Bàn</span>
+            <input type='text' value='<%= activeTableOrder.label %>' readonly>
+          </label>
+          <label>
+            <span>Tên khách (không bắt buộc)</span>
+            <input type='text' name='receiver_name' placeholder='Ví dụ: Anh Trung'>
+          </label>
+          <label>
+            <span>Số điện thoại (không bắt buộc)</span>
+            <input type='text' name='receiver_phone' placeholder='Nếu cần liên hệ'>
+          </label>
+          <label class='is-wide'>
+            <span>Ghi chú cho quầy</span>
+            <input type='text' name='note' placeholder='Ví dụ: ít đá, mang ra sau 5 phút...'>
+          </label>
+        </div>
+      </section>
+    <% } else { %>
+      <section class='cart-panel cart-option-panel'>
+        <div class='cart-section-title'>
+          <h2>1. Hình thức nhận đơn</h2>
+          <p>Chọn cách bạn muốn nhận đơn hàng.</p>
+        </div>
+        <div class='cart-option-grid'>
+          <label class='cart-option'>
+            <input type='radio' name='order_type' value='dine-in'>
+            <span>&#127860;</span>
+            <strong>Dùng tại quán</strong>
+            <small>Thưởng thức đơn hàng tại Brew Haven</small>
+          </label>
+          <label class='cart-option'>
+            <input type='radio' name='order_type' value='takeaway'>
+            <span>&#127857;</span>
+            <strong>Mang đi</strong>
+            <small>Đến quán nhận đơn và mang đi</small>
+          </label>
+          <label class='cart-option'>
+            <input type='radio' name='order_type' value='delivery' checked>
+            <span>&#128666;</span>
+            <strong>Giao hàng</strong>
+            <small>Brew Haven giao đến địa chỉ của bạn</small>
+          </label>
+        </div>
+      </section>
+
+      <section class='cart-panel cart-details-panel'>
+        <div class='cart-section-title'>
+          <h2>2. Thông tin nhận hàng</h2>
+          <p>Vui lòng nhập thông tin để Brew Haven xử lý đơn hàng.</p>
+        </div>
+        <div class='cart-field-grid'>
+          <label>
+            <span>Họ và tên</span>
+            <input type='text' name='receiver_name' value='<%= user.full_name || '' %>' placeholder='Nguyễn Văn A' required>
+          </label>
+          <label>
+            <span>Số điện thoại</span>
+            <input type='text' name='receiver_phone' value='<%= user.phone || '' %>' placeholder='0901 234 567' required>
+          </label>
+          <label>
+            <span>Tỉnh/Thành phố</span>
+            <select id='cartProvinceSelect' name='shipping_province' required>
+              <option value=''>Chọn tỉnh/thành phố</option>
+              <option value='Tỉnh Hưng Yên'>Tỉnh Hưng Yên</option>
+              <option value='Thành phố Hà Nội'>Thành phố Hà Nội</option>
+              <option value='Thành phố Hải Phòng'>Thành phố Hải Phòng</option>
+            </select>
+          </label>
+          <label>
+            <span>Xã/Phường</span>
+            <select id='cartWardSelect' name='shipping_ward' required>
+              <option value=''>Chọn xã/phường</option>
+            </select>
+          </label>
+          <input id='cartShippingAddress' type='hidden' name='shipping_address' value='<%= userAddress %>' data-saved-address='<%= userAddress %>'>
+          <label class='is-wide'>
+            <span>Ghi chú cho nhân viên giao hàng (không bắt buộc)</span>
+            <input type='text' name='note' placeholder='Vui lòng gọi cho tôi khi đến nơi. Cảm ơn!'>
+          </label>
+        </div>
+        <label class='cart-save-address'>
+          <input type='checkbox' name='save_address' value='1' checked>
+          <span>Lưu địa chỉ này cho lần sau</span>
+        </label>
+      </section>
+
+      <section class='cart-panel cart-payment-panel'>
+        <div class='cart-section-title'>
+          <h2>3. Phương thức thanh toán</h2>
+          <p>Chọn phương thức thanh toán bạn muốn sử dụng.</p>
+        </div>
+        <div class='cart-option-grid cart-option-grid--payment'>
+          <label class='cart-option'>
+            <input type='radio' name='payment_method' value='COD' checked>
+            <span>&#128181;</span>
+            <strong>Thanh toán khi nhận hàng</strong>
+            <small>Trả tiền mặt khi bạn nhận đơn</small>
+          </label>
+          <label class='cart-option'>
+            <input type='radio' name='payment_method' value='BANK_TRANSFER'>
+            <span>&#127974;</span>
+            <strong>Chuyển khoản ngân hàng</strong>
+            <small>Chuyển khoản vào tài khoản của Brew Haven</small>
+          </label>
+          <label class='cart-option'>
+            <input type='radio' name='payment_method' value='E_WALLET'>
+            <span>&#128179;</span>
+            <strong>Ví điện tử</strong>
+            <small>Thanh toán qua MoMo, ZaloPay hoặc VNPay</small>
+          </label>
+        </div>
+      </section>
+    <% } %>
+
+    <button class='cart-place-order' type='submit'><%= activeTableOrder ? 'Gửi đơn tới quầy' : 'Đặt hàng' %> <span>&bull;</span> <%- formatMoney(totalPayment) %></button>
+    <p class='cart-secure-note'>&#128274; Thông tin đơn hàng của bạn được bảo mật</p>
+  </form>
+
+  <script>
+    (function() {
+      var addressOptions = {
+        'Tỉnh Hưng Yên': [
+          'Khoái Châu',
+          'Văn Giang',
+          'Mỹ Hào',
+          'Ân Thi',
+          'Kim Động',
+          'Tiên Lữ',
+          'Phù Cừ',
+          'Yên Mỹ',
+          'Văn Lâm',
+          'Thành phố Hưng Yên'
+        ],
+        'Thành phố Hà Nội': [
+          'Ba Đình',
+          'Hoàn Kiếm',
+          'Đống Đa',
+          'Hai Bà Trưng',
+          'Cầu Giấy',
+          'Thanh Xuân',
+          'Tây Hồ',
+          'Long Biên',
+          'Hà Đông',
+          'Nam Từ Liêm',
+          'Bắc Từ Liêm',
+          'Hoàng Mai'
+        ],
+        'Thành phố Hải Phòng': [
+          'Hồng Bàng',
+          'Lê Chân',
+          'Ngô Quyền',
+          'Hải An',
+          'Kiến An',
+          'Đồ Sơn',
+          'Dương Kinh',
+          'Thủy Nguyên',
+          'An Dương',
+          'An Lão',
+          'Kiến Thụy',
+          'Tiên Lãng'
+        ]
+      };
+
+      var provinceSelect = document.getElementById('cartProvinceSelect');
+      var wardSelect = document.getElementById('cartWardSelect');
+      var addressInput = document.getElementById('cartShippingAddress');
+      var form = document.querySelector('.cart-order-form');
+      var savedAddress = addressInput ? addressInput.getAttribute('data-saved-address') || '' : '';
+
+      function normalizeText(value) {
+        return String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+      }
+
+      function syncAddress() {
+        var province = provinceSelect ? provinceSelect.value : '';
+        var ward = wardSelect ? wardSelect.value : '';
+        if (addressInput) addressInput.value = [ward, province].filter(Boolean).join(' - ');
+      }
+
+      function renderWards(selectedWard) {
+        var province = provinceSelect ? provinceSelect.value : '';
+        var wards = addressOptions[province] || [];
+        if (!wardSelect) return;
+
+        wardSelect.innerHTML = '<option value="">Chọn xã/phường</option>';
+        wards.forEach(function(ward) {
+          var option = document.createElement('option');
+          option.value = ward;
+          option.textContent = ward;
+          if (selectedWard && normalizeText(selectedWard) === normalizeText(ward)) option.selected = true;
+          wardSelect.appendChild(option);
+        });
+
+        syncAddress();
+      }
+
+      function initFromSavedAddress() {
+        var normalizedAddress = normalizeText(savedAddress);
+        var selectedProvince = '';
+        var selectedWard = '';
+
+        Object.keys(addressOptions).forEach(function(province) {
+          if (!selectedProvince && normalizedAddress.includes(normalizeText(province).replace('tinh ', '').replace('thanh pho ', ''))) {
+            selectedProvince = province;
+          }
+
+          addressOptions[province].forEach(function(ward) {
+            if (!selectedWard && normalizedAddress.includes(normalizeText(ward))) {
+              selectedWard = ward;
+              selectedProvince = province;
+            }
+          });
+        });
+
+        if (!selectedProvince) selectedProvince = 'Tỉnh Hưng Yên';
+        if (provinceSelect) provinceSelect.value = selectedProvince;
+        renderWards(selectedWard);
+      }
+
+      if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+          renderWards('');
+        });
+      }
+
+      if (wardSelect) {
+        wardSelect.addEventListener('change', syncAddress);
+      }
+
+      if (form) {
+        form.addEventListener('submit', syncAddress);
+      }
+
+      initFromSavedAddress();
+    })();
+  </script>
+<% } %>

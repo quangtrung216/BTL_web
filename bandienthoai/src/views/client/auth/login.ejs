@@ -1,0 +1,74 @@
+<section class='login-shell'>
+  <div class='login-visual'>
+    <img src='/images/logo/logo1.jpg' alt='Brew Haven coffee' onerror="this.style.display='none';">
+    <div class='login-visual__copy'>
+      <h1>Welcome to<br>Brew Haven</h1>
+      <p>Handcrafted drinks, cozy vibes, and moments that make life better.</p>
+      <span aria-hidden='true'>*</span>
+    </div>
+  </div>
+
+  <div class='login-panel'>
+    <div class='login-card'>
+      <h1>Welcome Back</h1>
+      <p>Login to access your account and continue your journey with Brew Haven.</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class='login-error'><%= error %></div>
+      <% } %>
+
+      <form method='post' action='/login' class='login-form'>
+        <label>
+          <span>Email</span>
+          <div class='login-field'>
+            <span aria-hidden='true'>@</span>
+            <input type='email' name='email' placeholder='Enter your email' autocomplete='email' required>
+          </div>
+        </label>
+
+        <label>
+          <span>Password</span>
+          <div class='login-field'>
+            <span aria-hidden='true'>#</span>
+            <input id='loginPassword' type='password' name='password' placeholder='Enter your password' autocomplete='current-password' required>
+            <button type='button' id='toggleLoginPassword' aria-label='Show password'>Show</button>
+          </div>
+        </label>
+
+        <div class='login-row'>
+          <label class='login-remember'>
+            <input type='checkbox' name='remember' checked>
+            <span>Remember me</span>
+          </label>
+          <a href='/change-password'>Forgot password?</a>
+        </div>
+
+        <button type='submit' class='login-submit'>Login</button>
+      </form>
+
+      <div class='login-divider'><span>or continue with</span></div>
+
+      <div class='login-social'>
+        <button type='button'><strong>G</strong>Continue with Google</button>
+        <button type='button'><strong>f</strong>Continue with Facebook</button>
+      </div>
+
+      <p class='login-register'>Don't have an account? <a href='/register'>Register</a></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var button = document.getElementById('toggleLoginPassword');
+    var input = document.getElementById('loginPassword');
+    if (!button || !input) return;
+
+    button.addEventListener('click', function() {
+      var isPassword = input.getAttribute('type') === 'password';
+      input.setAttribute('type', isPassword ? 'text' : 'password');
+      button.textContent = isPassword ? 'Hide' : 'Show';
+      button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    });
+  })();
+</script>

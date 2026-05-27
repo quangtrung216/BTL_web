@@ -1,0 +1,71 @@
+<% const data = item || currentUser || {}; %>
+
+<section class='admin-profile-page'>
+  <div class='admin-profile-hero'>
+    <div class='admin-profile-avatar'><%= String(data.full_name || data.email || 'A').charAt(0).toUpperCase() %></div>
+    <div>
+      <p>Hồ sơ quản trị</p>
+      <h1><%= data.full_name || 'Admin' %></h1>
+      <span><%= data.email || 'Chưa có email' %></span>
+    </div>
+  </div>
+
+  <div class='admin-profile-grid'>
+    <aside class='admin-profile-summary'>
+      <h2>Thông tin tài khoản</h2>
+      <dl>
+        <div>
+          <dt>Vai trò</dt>
+          <dd><%= data.role_name || 'Admin' %></dd>
+        </div>
+        <div>
+          <dt>Trạng thái</dt>
+          <dd><%= data.status || 'active' %></dd>
+        </div>
+        <div>
+          <dt>Ngày tạo</dt>
+          <dd><%= data.created_at ? new Date(data.created_at).toLocaleDateString('vi-VN') : '-' %></dd>
+        </div>
+      </dl>
+      <a class='admin-table-link' href='/change-password'>Đổi mật khẩu</a>
+      <form method='post' action='/logout'>
+        <button class='admin-danger-button' type='submit'>Đăng xuất</button>
+      </form>
+    </aside>
+
+    <div class='admin-profile-form-card'>
+      <div class='panel-heading'>
+        <div>
+          <h2>Thông tin cá nhân</h2>
+          <p>Cập nhật thông tin hiển thị trong khu vực quản trị.</p>
+        </div>
+      </div>
+
+      <form class='admin-profile-form' method='post' action='/admin/profile/update'>
+        <label>
+          <span>Họ tên</span>
+          <input type='text' name='full_name' value='<%= data.full_name || "" %>' required>
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type='email' value='<%= data.email || "" %>' disabled>
+        </label>
+
+        <label>
+          <span>Số điện thoại</span>
+          <input type='text' name='phone' value='<%= data.phone || "" %>'>
+        </label>
+
+        <label>
+          <span>Địa chỉ</span>
+          <textarea name='address'><%= data.address || "" %></textarea>
+        </label>
+
+        <div class='admin-profile-actions'>
+          <button type='submit'>Lưu hồ sơ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

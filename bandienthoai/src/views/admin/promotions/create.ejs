@@ -1,0 +1,14 @@
+<div class='container'>
+  <h1>Tạo khuyến mãi</h1>
+  <form method='post' action='/admin/promotions/create'>
+    <p>Biểu mẫu cơ bản. Bạn có thể chỉnh lại trường cho đúng nghiệp vụ.</p>
+    <div><input type='text' name='name' value='<%= item && item.name ? item.name : " %>' placeholder='name'></div>
+    <div><input type='text' name='title' value='<%= item && item.title ? item.title : " %>' placeholder='title'></div>
+    <div><input type='text' name='full_name' value='<%= item && item.full_name ? item.full_name : " %>' placeholder='full_name'></div>
+    <div><input type='email' name='email' value='<%= item && item.email ? item.email : " %>' placeholder='email'></div>
+    <div><input type='number' name='price' value='<%= item && item.price ? item.price : " %>' placeholder='price'></div>
+    <div><input type='number' name='stock' value='<%= item && item.stock ? item.stock : " %>' placeholder='stock'></div>
+    <div><textarea name='description' placeholder='description'><%= item && item.description ? item.description : " %></textarea></div>
+    <button type='submit'>Lưu</button>
+  </form>
+</div>

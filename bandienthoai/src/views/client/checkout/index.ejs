@@ -1,0 +1,13 @@
+<div class='container'>
+  <h1>Thanh toán</h1>
+  <% if (typeof error !== 'undefined' && error) { %><p><%= error %></p><% } %>
+  <p>Tổng tiền: <%= summary ? summary.totalAmount : 0 %></p>
+  <form method='post' action='/checkout'>
+    <div><input type='text' name='receiver_name' placeholder='Người nhận'></div>
+    <div><input type='text' name='receiver_phone' placeholder='Số điện thoại'></div>
+    <div><input type='text' name='shipping_address' placeholder='Địa chỉ giao hàng'></div>
+    <div><input type='text' name='payment_method' value='COD' placeholder='Phương thức thanh toán'></div>
+    <div><textarea name='note' placeholder='Ghi chú'></textarea></div>
+    <button type='submit'>Đặt hàng</button>
+  </form>
+</div>

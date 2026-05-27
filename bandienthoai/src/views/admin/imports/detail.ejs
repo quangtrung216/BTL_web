@@ -1,0 +1,19 @@
+<div class='container'>
+  <h1>Chi tiết phiếu nhập</h1>
+  <% const data = item || product || null; %>
+  <% if (!data) { %>
+    <p>Không có dữ liệu.</p>
+  <% } else { %>
+    <table border='1' cellpadding='8' cellspacing='0'>
+      <tbody>
+        <% Object.keys(data).forEach(function(key) { %>
+          <tr>
+            <th><%= key %></th>
+            <td><%= data[key] %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+  
+</div>

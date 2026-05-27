@@ -1,0 +1,28 @@
+<div class='container'>
+  <h1>Phiếu nhập staff</h1>
+  <% const rows = Array.isArray(items) ? items : []; %>
+  <% if (!rows.length) { %>
+    <p>Chưa có dữ liệu.</p>
+  <% } else { %>
+    <table border='1' cellpadding='8' cellspacing='0'>
+      <thead>
+        <tr>
+          <% Object.keys(rows[0]).forEach(function(key) { %>
+            <th><%= key %></th>
+          <% }) %>
+          <th>Chi tiết</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(row) { %>
+          <tr>
+            <% Object.keys(rows[0]).forEach(function(key) { %>
+              <td><%= row[key] %></td>
+            <% }) %>
+            <td><a href='/staff/imports/<%= row.id %>'>Xem</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

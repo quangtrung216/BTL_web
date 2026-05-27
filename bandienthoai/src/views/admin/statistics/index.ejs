@@ -1,0 +1,12 @@
+<div class='container'>
+            <h1>Thống kê</h1>
+            <% const data = items || summary || item || {}; %>
+            <table border='1' cellpadding='8' cellspacing='0'>
+                <tbody>
+                <% Object.keys(data).forEach(function(key) { %>
+                    <tr><th><%= key %></th><td><%= data[key] %></td></tr>
+                <% }) %>
+                </tbody>
+            </table>
+            </div>
+            

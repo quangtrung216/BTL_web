@@ -1,0 +1,79 @@
+<%
+  const rows = Array.isArray(items) ? items : [];
+  const keyword = query && query.keyword ? query.keyword : '';
+  const activeCategoryId = query && query.category_id ? String(query.category_id) : '';
+  const activeTableOrder = typeof tableOrder !== 'undefined' && tableOrder ? tableOrder : null;
+  const categories = [
+    { id: '', name: 'All', href: '/products' },
+    { id: '1', name: 'Coffee', href: '/products/filter?category_id=1' },
+    { id: '2', name: 'Milk Tea', href: '/products/filter?category_id=2' },
+    { id: '3', name: 'Fruit Tea', href: '/products/filter?category_id=3' },
+    { id: '4', name: 'Blended', href: '/products/filter?category_id=4' },
+    { id: '5', name: 'Cakes', href: '/products/filter?category_id=5' }
+  ];
+%>
+
+<section class='menu-hero'>
+  <div>
+    <p class='menu-eyebrow'>Freshly brewed, made to order</p>
+    <h1>Menu</h1>
+    <p>Choose your favourite Brew Haven drinks, desserts, and seasonal picks.</p>
+  </div>
+  <form class='menu-search' method='get' action='/products/search'>
+    <input type='text' name='keyword' placeholder='Search menu...' value='<%= keyword %>'>
+    <button type='submit'>Search</button>
+  </form>
+</section>
+
+<% if (activeTableOrder) { %>
+  <section class='table-order-banner'>
+    <div>
+      <strong>Đang đặt món cho <%= activeTableOrder.label %></strong>
+      <span>Chọn món rồi mở giỏ hàng để gửi đơn tới quầy.</span>
+    </div>
+    <a href='/cart'>Xem giỏ hàng</a>
+  </section>
+<% } %>
+
+<section class='menu-tabs' aria-label='Menu categories'>
+  <% categories.forEach(function(category) { %>
+    <a class='<%= String(category.id) === activeCategoryId ? "is-active" : "" %>' href='<%= category.href %>'><%= category.name %></a>
+  <% }); %>
+</section>
+
+<% if (!rows.length) { %>
+  <section class='menu-empty'>
+    <h2>No products found</h2>
+    <p>Try a different keyword or check back later.</p>
+  </section>
+<% } else { %>
+  <section class='menu-grid'>
+    <% rows.forEach(function(p) { %>
+      <article class='menu-card'>
+        <a class='menu-card__media' href='/products/<%= p.id %>'>
+          <% if (p.image_url) { %>
+            <img src='<%= p.image_url %>' alt='<%= p.name %>' onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <span class='menu-card__placeholder'>No image</span>
+          <% } else { %>
+            <span class='menu-card__placeholder'>No image</span>
+          <% } %>
+        </a>
+        <div class='menu-card__body'>
+          <div class='menu-card__top'>
+            <h2><a href='/products/<%= p.id %>'><%= p.name %></a></h2>
+            <span><%= Number(p.base_price || 0).toLocaleString('vi-VN') %>d</span>
+          </div>
+          <p><%= p.description ? String(p.description).slice(0, 96) : 'Freshly prepared Brew Haven favourite.' %><%= p.description && String(p.description).length > 96 ? '...' : '' %></p>
+          <div class='menu-card__actions'>
+            <a href='/products/<%= p.id %>'>View Detail</a>
+            <form action='/cart/add' method='POST'>
+              <input type='hidden' name='product_id' value='<%= p.id %>'>
+              <input type='hidden' name='quantity' value='1'>
+              <button type='submit' aria-label='Add <%= p.name %> to cart'>+</button>
+            </form>
+          </div>
+        </div>
+      </article>
+    <% }); %>
+  </section>
+<% } %>

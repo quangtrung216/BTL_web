@@ -1,0 +1,125 @@
+<% const data = items || summary || item || {}; %>
+<% const revenue = Number(data.totalRevenue || 0); %>
+
+<section class='admin-dashboard'>
+  <div class='admin-page-title'>
+    <h1>Tổng quan</h1>
+    <p>Theo dõi nhanh doanh thu, đơn hàng, sản phẩm và khách hàng.</p>
+  </div>
+
+  <div class='metric-grid'>
+    <article class='metric-card'>
+      <span class='metric-card__icon is-green'>VND</span>
+      <small>Tổng doanh thu</small>
+      <strong><%= revenue.toLocaleString('vi-VN') %> đ</strong>
+      <em>+ 12.5% so với hôm qua</em>
+    </article>
+
+    <article class='metric-card'>
+      <span class='metric-card__icon is-peach'>OD</span>
+      <small>Tổng đơn hàng</small>
+      <strong><%= Number(data.totalOrders || 0).toLocaleString('vi-VN') %></strong>
+      <em>+ 8.7% so với hôm qua</em>
+    </article>
+
+    <article class='metric-card'>
+      <span class='metric-card__icon is-blue'>SP</span>
+      <small>Sản phẩm</small>
+      <strong><%= Number(data.totalProducts || 0).toLocaleString('vi-VN') %></strong>
+      <em>+ 7.1% đang kinh doanh</em>
+    </article>
+
+    <article class='metric-card'>
+      <span class='metric-card__icon is-brown'>KH</span>
+      <small>Khách hàng</small>
+      <strong><%= Number(data.totalUsers || 0).toLocaleString('vi-VN') %></strong>
+      <em>+ 10.3% tài khoản hoạt động</em>
+    </article>
+  </div>
+
+  <div class='dashboard-grid'>
+    <section class='dashboard-panel revenue-panel'>
+      <div class='panel-heading'>
+        <div>
+          <h2>Doanh thu</h2>
+          <p>7 ngày gần nhất</p>
+        </div>
+        <a href='/admin/statistics'>Xem báo cáo</a>
+      </div>
+      <div class='bar-chart' aria-label='Biểu đồ doanh thu'>
+        <% [42, 48, 61, 44, 45, 64, 63].forEach(function(value, index) { %>
+          <span style='--h:<%= value %>%' data-label='<%= 12 + index %>/05'></span>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class='dashboard-panel'>
+      <div class='panel-heading'>
+        <h2>Sản phẩm bán chạy</h2>
+        <a href='/admin/products'>Xem tất cả</a>
+      </div>
+      <ul class='top-products'>
+        <% [
+          ['Cà phê sữa đá', 'Đã bán: 156 ly', '31.200.000 đ'],
+          ['Bạc xỉu', 'Đã bán: 132 ly', '23.760.000 đ'],
+          ['Cappuccino', 'Đã bán: 98 ly', '19.600.000 đ'],
+          ['Cold Brew', 'Đã bán: 85 ly', '17.850.000 đ'],
+          ['Matcha Latte', 'Đã bán: 74 ly', '14.800.000 đ']
+        ].forEach(function(product, index) { %>
+          <li>
+            <span><%= index + 1 %></span>
+            <div>
+              <strong><%= product[0] %></strong>
+              <small><%= product[1] %></small>
+            </div>
+            <em><%= product[2] %></em>
+          </li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section class='dashboard-panel orders-panel'>
+      <div class='panel-heading'>
+        <h2>Đơn hàng gần đây</h2>
+        <a href='/admin/orders'>Xem tất cả</a>
+      </div>
+      <div class='admin-table-wrap'>
+        <table class='admin-table'>
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Khách hàng</th>
+              <th>Tổng tiền</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% [
+              ['#DH0256', 'Trần Minh Tâm', '195.000 đ', 'Hoàn thành'],
+              ['#DH0255', 'Nguyễn Hoàng Anh', '245.000 đ', 'Đang pha chế'],
+              ['#DH0254', 'Lê Quang Huy', '120.000 đ', 'Đang giao'],
+              ['#DH0253', 'Phạm Thu Trang', '320.000 đ', 'Hoàn thành']
+            ].forEach(function(order) { %>
+              <tr>
+                <td><%= order[0] %></td>
+                <td><%= order[1] %></td>
+                <td><%= order[2] %></td>
+                <td><span class='status-pill'><%= order[3] %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class='dashboard-panel quick-panel'>
+      <div class='panel-heading'>
+        <h2>Thao tác nhanh</h2>
+      </div>
+      <a href='/admin/products/create'>+ Thêm sản phẩm</a>
+      <a href='/admin/orders'>+ Tạo đơn hàng</a>
+      <a href='/admin/promotions/create'>+ Tạo khuyến mãi</a>
+      <a href='/admin/statistics'>R Xem báo cáo</a>
+    </section>
+  </div>
+</section>

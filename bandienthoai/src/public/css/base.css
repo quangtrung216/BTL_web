@@ -1,0 +1,24 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+.container { width: 1200px; max-width: 95%; margin: 0 auto; }
+
+:root {
+  --brew-font: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f4;
+  --text: #2c3e50;
+  --muted: #6c757d;
+  --border: #dee2e6;
+  --primary: #8b4513;
+  --primary-2: #6f3709;
+  --secondary: #d4a574;
+  --accent: #c8956d;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --radius: 8px;
+  --transition: all 0.3s ease;
+}
+
