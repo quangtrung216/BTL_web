@@ -13,6 +13,7 @@ module.exports = (app) => {
   app.use('/', require('./client/page.routes'));
 
   app.use('/admin', require('./admin/dashboard.routes'));
+  app.use('/admin', require('./admin/realtime.routes'));
   app.use('/admin/profile', require('./admin/profile.routes'));
   app.use('/admin/products', require('./admin/product.routes'));
   app.use('/admin/categories', require('./admin/category.routes'));

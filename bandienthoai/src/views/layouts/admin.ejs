@@ -78,5 +78,20 @@
       </footer>
     </div>
   </div>
+  <script>
+    (function () {
+      if (!window.EventSource) return;
+
+      var shouldReloadForOrders = location.pathname === '/admin' || location.pathname.indexOf('/admin/orders') === 0;
+      if (!shouldReloadForOrders) return;
+
+      var source = new EventSource('/admin/orders/events');
+      source.addEventListener('table-order-created', function () {
+        window.setTimeout(function () {
+          location.reload();
+        }, 400);
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -121,17 +121,27 @@ document.addEventListener('DOMContentLoaded', function() {
     let isPaused = false;
 
     const rotateBestSeller = function() {
-      if (isPaused || homeCarousel.classList.contains('is-sliding')) return;
+      if (
+        isPaused ||
+        homeCarousel.classList.contains('is-preparing') ||
+        homeCarousel.classList.contains('is-sliding')
+      ) return;
 
-      const firstCard = homeCarousel.firstElementChild;
-      if (!firstCard) return;
+      const lastCard = homeCarousel.lastElementChild;
+      if (!lastCard) return;
 
-      homeCarousel.classList.add('is-sliding');
+      homeCarousel.insertBefore(lastCard, homeCarousel.firstElementChild);
+      homeCarousel.classList.add('is-preparing');
+      homeCarousel.offsetWidth;
+
+      window.requestAnimationFrame(function() {
+        homeCarousel.classList.remove('is-preparing');
+        homeCarousel.classList.add('is-sliding');
+      });
 
       window.setTimeout(function() {
-        homeCarousel.appendChild(firstCard);
         homeCarousel.classList.remove('is-sliding');
-      }, 720);
+      }, 940);
     };
 
     carouselTimer = window.setInterval(rotateBestSeller, 10000);

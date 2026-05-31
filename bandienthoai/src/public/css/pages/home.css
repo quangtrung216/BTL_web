@@ -377,13 +377,20 @@ body.home-page .page__content {
   flex: 0 0 calc((100% - 45px) / 4);
 }
 
-.home-products--carousel.is-sliding .home-product {
+.home-products--carousel.is-preparing .home-product {
   transform: translateX(calc(-100% - 15px));
-  transition: transform .7s ease;
+  transition: none;
+}
+
+.home-products--carousel.is-sliding .home-product {
+  transform: translateX(0);
+  transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .home-product {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   border: 1px solid var(--home-line);
   border-radius: 8px;
@@ -401,6 +408,7 @@ body.home-page .page__content {
 
 .home-product__image {
   display: block;
+  flex: 0 0 auto;
   height: 86px;
   background: #f2e3d2;
 }
@@ -453,24 +461,36 @@ body.home-page .page__content {
 }
 
 .home-product__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   padding: 9px 10px 10px;
 }
 
 .home-product h3 {
+  display: -webkit-box;
+  min-height: 33px;
   margin: 0 0 4px;
+  overflow: hidden;
   color: #2f1b12;
   font-family: Arial, sans-serif;
   font-size: 13px;
   line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .home-product p {
+  display: -webkit-box;
   min-height: 32px;
   margin: 0 0 8px;
+  overflow: hidden;
   color: #756b64;
   font-family: Arial, sans-serif;
   font-size: 11px;
   line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .home-product__row {
@@ -478,6 +498,7 @@ body.home-page .page__content {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-top: auto;
 }
 
 .home-product__row strong {
@@ -945,7 +966,7 @@ body.home-page .footer-bottom p {
     flex: 0 0 100%;
   }
 
-  .home-products--carousel.is-sliding .home-product {
+  .home-products--carousel.is-preparing .home-product {
     transform: translateX(calc(-100% - 8px));
   }
 
@@ -980,10 +1001,13 @@ body.home-page .footer-bottom p {
   }
 
   .home-product h3 {
+    display: block;
+    min-height: 0;
     font-size: 11px;
   }
 
   .home-product p {
+    display: block;
     min-height: 0;
     max-width: 170px;
     overflow: hidden;

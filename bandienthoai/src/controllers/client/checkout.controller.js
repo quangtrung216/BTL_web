@@ -1,4 +1,5 @@
 const checkoutService = require('../../services/checkout.service');
+const realtimeService = require('../../services/realtime.service');
 const userService = require('../../services/user.service');
 
 module.exports = {
@@ -35,6 +36,10 @@ module.exports = {
       delete req.session.cartPromotionMessage;
       delete req.session.cartPromotionError;
       if (req.session.tableOrder) {
+        realtimeService.publishTableOrderCreated({
+          orderId: result.orderId,
+          table: req.session.tableOrder
+        });
         req.session.guestCart = [];
         req.session.appToast = {
           type: 'success',
